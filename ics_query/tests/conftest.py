@@ -10,7 +10,7 @@ from typing import NamedTuple
 import pytest
 
 HERE = Path(__file__).parent
-IO_DIRECTORY = HERE / "io"
+IO_DIRECTORY = HERE / "runs"
 
 
 class TestRun(NamedTuple):
@@ -18,14 +18,19 @@ class TestRun(NamedTuple):
 
     exit_code: int
     output: str
+    error: str
 
     @classmethod
     def from_completed_process(
         cls, completed_process: subprocess.CompletedProcess
     ) -> TestRun:
         """Create a new run result."""
+        stdout = completed_process.stdout.decode("UTF-8").replace("\r\n", "\n")
+        print(stdout)
         return cls(
-            completed_process.returncode, completed_process.stdout.decode("UTF-8")
+            completed_process.returncode,
+            stdout,
+            completed_process.stderr.decode("UTF-8"),
         )
 
 
@@ -40,20 +45,19 @@ class IOTestCase(NamedTuple):
     @classmethod
     def from_path(cls, path: Path) -> IOTestCase:
         """Create a new testcase from the files."""
-        return cls(
-            path.name, path.stem.split(), path.parent, path.read_text(encoding="UTF-8")
-        )
+        expected_output = path.read_text(encoding="UTF-8").replace("\r\n", "\n")
+        return cls(path.name, path.stem.split(), path.parent, expected_output)
 
     def run(self) -> TestRun:
         """Run this test case and return the result."""
         command = ["ics-query", *self.command]
-        print(" ".join(command))  # noqa: T201
+        print(" ".join(command))
         completed_process = subprocess.run(  # noqa: S603, RUF100
             command,  # noqa: S603, RUF100
-            stdout=subprocess.PIPE,
+            capture_output=True,
             timeout=3,
             check=False,
-            cwd=self.cwd,
+            cwd=self.cwd / "calendars",
         )
         return TestRun.from_completed_process(completed_process)
 

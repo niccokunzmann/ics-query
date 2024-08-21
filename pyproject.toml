@@ -30,6 +30,7 @@ dependencies = [
     "icalendar",
     "recurring-ical-events",
     "click",
+    "icalendar",
 ]
 
 [project.optional-dependencies]
@@ -89,6 +90,7 @@ ignore = [
     "S101",    # Use of assert detected
     "TD",      # TODO comments
     "TRY003",  # Avoid specifying long messages outside the exception class
+    "T201",    # print found
 ]
 extend-safe-fixes = [
     "PT006", # Wrong type passed to first argument of @pytest.mark.parametrize; expected {expected_string}
