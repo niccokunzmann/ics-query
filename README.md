@@ -43,6 +43,12 @@ Examples: `0,2,4` `0-10`
 
 ## `ics-query all` - the whole calendar
 
+## `ics-query between` - time ranges
+
+```
+ics-query between dt dt
+ics-query between dt duration
+```
 
 ## `ics-query --select-component` - filter for components
 
@@ -61,3 +67,17 @@ Example:
 3. increase sequence number
 4. add the event to the end of the calendar file
 5. show that the occurrence has changed
+
+## Piping calendars
+
+```
+cat calendar.ics | ics-query --output=count --filter-component=VEVENT all > calendar-event-count.int
+```
+
+## Notifications
+
+Examples:
+
+- There are x todos in the next hour
+- There are x events today
+- Please write a journal entry!
