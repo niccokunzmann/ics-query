@@ -95,7 +95,7 @@ extend-safe-fixes = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"test/*" = [
+"ics_query/tests" = [
     "B011",   # Do not assert False (python -O removes these calls), raise AssertionError()
     "DTZ001", # datetime.datetime() called without a tzinfo argument
     "E501",   # Indentation is not a multiple of {indent_size}

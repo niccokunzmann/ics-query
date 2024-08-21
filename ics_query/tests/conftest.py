@@ -20,12 +20,16 @@ class TestRun(NamedTuple):
     output: str
 
     @classmethod
-    def from_completed_process(cls, completed_process: subprocess.CompletedProcess) -> TestRun:
+    def from_completed_process(
+        cls, completed_process: subprocess.CompletedProcess
+    ) -> TestRun:
         """Create a new run result."""
-        return cls(completed_process.returncode, completed_process.stdout)
+        return cls(
+            completed_process.returncode, completed_process.stdout.decode("UTF-8")
+        )
 
 
-class IOTestCase:
+class IOTestCase(NamedTuple):
     """An example test case."""
 
     name: str
@@ -42,12 +46,14 @@ class IOTestCase:
 
     def run(self) -> TestRun:
         """Run this test case and return the result."""
-        completed_process = subprocess.run(
-            ["ics-query", *self.command],  # noqa: S603, S607
+        command = ["ics-query", *self.command]
+        print(" ".join(command))  # noqa: T201
+        completed_process = subprocess.run(  # noqa: S603, RUF100
+            command,  # noqa: S603, RUF100
             stdout=subprocess.PIPE,
             timeout=3,
             check=False,
-            cwd=io_testcase.cwd,
+            cwd=self.cwd,
         )
         return TestRun.from_completed_process(completed_process)
 
