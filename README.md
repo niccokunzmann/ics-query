@@ -1,5 +1,7 @@
 # ics-query
-Find out what happens when in ICS calendar files - query RFC 5545 files for events, journals, TODOs and more
+
+<!-- Change description also in pyproject.toml -->
+Find out what happens in ICS calendar files - query and filter RFC 5545 compatible `.ics` files for events, journals, TODOs and more.
 
 ## Installation
 
@@ -28,6 +30,7 @@ You can get all **TODO**s that happen at in certain **month**.
 ```shell
 ics-query --components VTODO at 2029-12-24 calendar.ics
 ```
+
 ## `ics-query at` - time ranges
 
 
@@ -45,7 +48,7 @@ Examples: `0,2,4` `0-10`
 
 ## `ics-query between` - time ranges
 
-```
+```shell
 ics-query between dt dt
 ics-query between dt duration
 ```
@@ -70,7 +73,7 @@ Example:
 
 ## Piping calendars
 
-```
+```shell
 cat calendar.ics | ics-query --output=count --filter-component=VEVENT all > calendar-event-count.int
 ```
 
@@ -81,3 +84,9 @@ Examples:
 - There are x todos in the next hour
 - There are x events today
 - Please write a journal entry!
+
+## Changelog
+
+- v0.0.1a
+
+  - first version
