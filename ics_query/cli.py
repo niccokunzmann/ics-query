@@ -11,6 +11,7 @@ import click
 import recurring_ical_events
 from icalendar import Calendar
 from recurring_ical_events import CalendarQuery
+from .version import __version__
 
 from . import parse
 
@@ -70,9 +71,13 @@ arg_output = click.argument("output", type=ComponentsResultArgument("wb"))
 
 
 @click.group()
+@click.version_option(__version__)
 def main():
-    """Simple program that greets NAME for a total of COUNT times."""
-    # sys.stdout = sys.stderr  # remove accidential print impact
+    """Find out what happens in ICS calendar files.
+
+    ics-query can query and filter RFC 5545 compatible .ics files.
+    Components are events, journal entries and TODOs.
+    """
 
 
 pass_datetime = click.make_pass_decorator(parse.to_time)
@@ -85,8 +90,13 @@ pass_datetime = click.make_pass_decorator(parse.to_time)
 def at(calendar: CalendarQuery, output: ComponentsResult, date: DateArgument):
     """Get the components at a certain time."""
     for event in calendar.at(date):
-        print("debug")
         output.add_component(event)
 
+@main.command()
+@click.argument("date", type=parse.to_time)
+def version(calendar: CalendarQuery, output: ComponentsResult, date: DateArgument):
+    """Get the components at a certain time."""
+    for event in calendar.at(date):
+        output.add_component(event)
 
 __all__ = ["main"]

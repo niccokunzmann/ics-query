@@ -5,12 +5,13 @@ from __future__ import annotations
 import subprocess
 from copy import deepcopy
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Callable
 
 import pytest
 
 HERE = Path(__file__).parent
 IO_DIRECTORY = HERE / "runs"
+CALENDARS_DIRECTORY = IO_DIRECTORY / "calendars"
 
 
 class TestRun(NamedTuple):
@@ -34,12 +35,26 @@ class TestRun(NamedTuple):
         )
 
 
+def run_ics_query(*command, cwd=CALENDARS_DIRECTORY) -> TestRun:
+    """Run ics-qeury with a command."""
+    cmd = ["ics-query", *command]
+    print(" ".join(cmd))
+    completed_process = subprocess.run(  # noqa: S603, RUF100
+        cmd,  # noqa: S603, RUF100
+        capture_output=True,
+        timeout=3,
+        check=False,
+        cwd=cwd,
+    )
+    return TestRun.from_completed_process(completed_process)
+
+
 class IOTestCase(NamedTuple):
     """An example test case."""
 
     name: str
     command: list[str]
-    cwd: Path
+    location: Path
     expected_output: str
 
     @classmethod
@@ -50,17 +65,7 @@ class IOTestCase(NamedTuple):
 
     def run(self) -> TestRun:
         """Run this test case and return the result."""
-        command = ["ics-query", *self.command]
-        print(" ".join(command))
-        completed_process = subprocess.run(  # noqa: S603, RUF100
-            command,  # noqa: S603, RUF100
-            capture_output=True,
-            timeout=3,
-            check=False,
-            cwd=self.cwd / "calendars",
-        )
-        return TestRun.from_completed_process(completed_process)
-
+        return run_ics_query(*self.command)
 
 io_test_cases = [
     IOTestCase.from_path(test_case_path)
@@ -74,5 +79,10 @@ def io_testcase(request) -> IOTestCase:
     """Go though all the IO test cases."""
     return deepcopy(request.param)
 
+
+@pytest.fixture()
+def run() -> Callable[..., TestRun]:
+    """Return a runner function."""
+    return run_ics_query
 
 __all__ = ["IOTestCase", "TestRun"]
