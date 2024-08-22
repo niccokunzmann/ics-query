@@ -162,6 +162,9 @@ To release new versions,
 
 - v0.1.0a
 
+  - Update Python version compatibility
+  - Add development documentation
+
 - v0.0.1a
 
   - first version
