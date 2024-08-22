@@ -15,7 +15,7 @@ maintainers = [
 ]
 description = "Find out what happens in ICS calendar files - query and filter RFC 5545 compatible .ics files for events, journals, TODOs and more."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 # see https://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
     "Development Status :: 3 - Alpha",
