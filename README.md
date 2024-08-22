@@ -11,7 +11,32 @@ You can install this package from the [PyPI](https://pypi.org/project/ics-query/
 pip install ics-query
 ```
 
-## `ics-query at` - occurrences at certain times
+## Usage
+
+See how to use `ics-query`.
+
+### Events at Certain Times
+
+You can query which events happen at certain times:
+
+```shell
+ics-query at <date-time> calendar.ics -
+```
+
+`<date-time>` can be built up: It can be a year, a month, a day, an hour, a minute or a second.
+
+Please see the command documentation for more help:
+
+```shell
+ics-query --help
+ics-query at --help
+```
+
+## Vision
+
+This section shows where we would like to get to.
+
+### `ics-query at` - occurrences at certain times
 
 You can get all **events** that happen at a certain **day**.
 
@@ -31,32 +56,32 @@ You can get all **TODO**s that happen at in certain **month**.
 ics-query --components VTODO at 2029-12-24 calendar.ics
 ```
 
-## `ics-query at` - time ranges
+### `ics-query at` - time ranges
 
 
-## `ics-query --output=count` - count occurrences
+### `ics-query --output=count` - count occurrences
 
 
-## `ics-query --output=ics` - use ics as output (default)
+### `ics-query --output=ics` - use ics as output (default)
 
 
-## `ics-query --select-index` - reduce output size
+### `ics-query --select-index` - reduce output size
 
 Examples: `0,2,4` `0-10`
 
-## `ics-query all` - the whole calendar
+### `ics-query all` - the whole calendar
 
-## `ics-query between` - time ranges
+### `ics-query between` - time ranges
 
 ```shell
 ics-query between dt dt
 ics-query between dt duration
 ```
 
-## `ics-query --select-component` - filter for components
+### `ics-query --select-component` - filter for components
 
 
-## `ics-query --select-uid` - filter by uid
+### `ics-query --select-uid` - filter by uid
 
 
 ## How to edit an event
@@ -160,6 +185,12 @@ To release new versions,
 5. Notify the issues about their release
 
 ## Changelog
+
+- v0.1.1a
+
+  - Add `--version`
+  - Add `ics-query at <date>`
+  - Add support for multiple calendars in one input
 
 - v0.1.0a
 
