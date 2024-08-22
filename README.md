@@ -85,13 +85,82 @@ Examples:
 - There are x events today
 - Please write a journal entry!
 
+## Version Fixing
+
+If you use this library in your code, you may want to make sure that
+updates can be received but they do not break your code.
+The version numbers are handeled this way: ``a.b.c`` example: ``0.1.12``
+
+- ``c`` is changed for each minor bug fix.
+- ``b`` is changed whenever new features are added.
+- ``a`` is changed when the interface or major assumptions change that may break your code.
+
+So, I recommend to version-fix this library to stay with the same ``a``
+while ``b`` and ``c`` can change.
+
+## Development
+
+This section should set you up for development.
+
+### Testing
+
+This project's development is driven by tests.
+Tests assure a consistent interface and less knowledge lost over time.
+If you like to change the code, tests help that nothing breaks in the future.
+They are required in that sense.
+Example code and ics files can be transferred into tests and speed up fixing bugs.
+
+You can view the tests in the [test folder](https://github.com/niccokunzmann/ics-query/tree/main/ics_query/tests)
+If you have a calendar ICS file for which this library does not
+generate the desired output, you can add it to the ``test/calendars``
+folder and write tests for what you expect.
+If you like, [open an issue](https://github.com/niccokunzmann/ics-query/issues) first, e.g. to discuss the changes and
+how to go about it.
+
+To run the tests, we use `tox`.
+`tox` tests all different Python versions which we want to  be compatible to.
+
+```shell
+pip3 install tox
+```
+
+To run all the tests:
+
+```shell
+tox
+```
+
+To run the tests in a specific Python version:
+
+```shell
+tox -e py39
+```
+
+We use ``ruff`` to format the code.
+Run this to format the code and show problems:
+
+```shell
+tox -e ruff
+```
+
 ## New Release
 
-You can create a new release:
+To release new versions,
 
+1. edit the Changelog Section
+2. create a commit and push it
+3. wait for [GitHub Actions](https://github.com/niccokunzmann/ics-query/actions) to finish the build
+4. create a tag and push it
 
+    ```shell
+    git tag v0.1.0a
+    ```
+
+5. Notify the issues about their release
 
 ## Changelog
+
+- v0.1.0a
 
 - v0.0.1a
 
