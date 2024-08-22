@@ -2,7 +2,7 @@
 
 import pytest
 
-from ics_query.parse import to_time, InvalidTimeFormat
+from ics_query.parse import InvalidTimeFormat, to_time
 
 
 @pytest.mark.parametrize(
@@ -55,9 +55,9 @@ def test_parse_to_date_argument(string_argument, expected_result):
         "",
         "132",
         "12345",
-    ]
+    ],
 )
-def test_invalid_time_format(dt:str):
+def test_invalid_time_format(dt: str):
     """Check invalid time formats."""
     with pytest.raises(InvalidTimeFormat):
         to_time(dt)
