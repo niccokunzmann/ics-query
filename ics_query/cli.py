@@ -52,18 +52,15 @@ class ComponentsResultArgument(click.File):
 
 
 class JoinedCalendars:
-
-    def __init__(self, calendars:list[Calendar]):
+    def __init__(self, calendars: list[Calendar]):
         """Join multiple calendars."""
-        self.queries = [
-            recurring_ical_events.of(calendar)
-            for calendar in calendars
-        ]
+        self.queries = [recurring_ical_events.of(calendar) for calendar in calendars]
 
     def at(self, dt: tuple[int]) -> t.Generator[Component]:
         """Return the components."""
         for query in self.queries:
             yield from query.at(dt)
+
 
 class CalendarQueryInputArgument(click.File):
     """Argument for the result."""

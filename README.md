@@ -15,6 +15,53 @@ pip install ics-query
 
 See how to use `ics-query`.
 
+### Examples
+
+You can easily get a calendar from the web and see what is on.
+In this example, we show which German National Holidays happen in August 2024:
+
+```shell
+$ wget -qO- 'https://www.calendarlabs.com/ical-calendar/ics/46/Germany_Holidays.ics' | ./ics-query at 2024-08 - -
+BEGIN:VEVENT
+SUMMARY:Assumption Day (BY\, SL)
+DTSTART;VALUE=DATE:20240815
+DTEND;VALUE=DATE:20240815
+DTSTAMP:20231013T092513Z
+UID:65290cf9326601697189113@calendarlabs.com
+SEQUENCE:0
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/the-assumption-of-m
+ ary.php to know more about Assumption Day (BY\, SL). \n\n Like us on Faceb
+ ook: http://fb.com/calendarlabs to get updates
+LOCATION:Germany
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+```
+
+In the following example, we query a calendar file and print the result.
+
+```shell
+$ ics-query at 2019-03-04 one-event.ics -
+BEGIN:VEVENT
+SUMMARY:test1
+DTSTART;TZID=Europe/Berlin:20190304T080000
+DTEND;TZID=Europe/Berlin:20190304T083000
+DTSTAMP:20190303T111937
+UID:UYDQSG9TH4DE0WM3QFL2J
+CREATED:20190303T111937
+LAST-MODIFIED:20190303T111937
+END:VEVENT
+```
+
+We can concatenate calendars and pipe them into `ics-query`.
+In the example below, we get all events that happen right now in two calendars.
+
+```shell
+$ cat calendar1.ics calendar2.ics | ics-query at `date +%Y%m%d%H%M%S` - -
+BEGIN:VEVENT
+...
+```
+
 ### Events at Certain Times
 
 You can query which events happen at certain times:
