@@ -154,6 +154,7 @@ To release new versions,
 
     ```shell
     git tag v0.1.0a
+    git push origin v0.1.0a
     ```
 
 5. Notify the issues about their release
