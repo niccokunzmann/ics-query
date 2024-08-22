@@ -5,7 +5,7 @@ from __future__ import annotations
 import subprocess
 from copy import deepcopy
 from pathlib import Path
-from typing import NamedTuple, Callable
+from typing import Callable, NamedTuple
 
 import pytest
 
@@ -67,6 +67,7 @@ class IOTestCase(NamedTuple):
         """Run this test case and return the result."""
         return run_ics_query(*self.command)
 
+
 io_test_cases = [
     IOTestCase.from_path(test_case_path)
     for test_case_path in IO_DIRECTORY.iterdir()
@@ -80,9 +81,10 @@ def io_testcase(request) -> IOTestCase:
     return deepcopy(request.param)
 
 
-@pytest.fixture()
+@pytest.fixture
 def run() -> Callable[..., TestRun]:
     """Return a runner function."""
     return run_ics_query
+
 
 __all__ = ["IOTestCase", "TestRun"]
