@@ -11,9 +11,9 @@ import click
 import recurring_ical_events
 from icalendar import Calendar
 from recurring_ical_events import CalendarQuery
-from .version import __version__
 
 from . import parse
+from .version import __version__
 
 if t.TYPE_CHECKING:
     from io import FileIO
@@ -92,11 +92,5 @@ def at(calendar: CalendarQuery, output: ComponentsResult, date: DateArgument):
     for event in calendar.at(date):
         output.add_component(event)
 
-@main.command()
-@click.argument("date", type=parse.to_time)
-def version(calendar: CalendarQuery, output: ComponentsResult, date: DateArgument):
-    """Get the components at a certain time."""
-    for event in calendar.at(date):
-        output.add_component(event)
 
 __all__ = ["main"]
