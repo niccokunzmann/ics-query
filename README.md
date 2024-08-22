@@ -85,6 +85,12 @@ Examples:
 - There are x events today
 - Please write a journal entry!
 
+## New Release
+
+You can create a new release:
+
+
+
 ## Changelog
 
 - v0.0.1a
