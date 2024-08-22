@@ -9,7 +9,7 @@ import typing as t
 
 import click
 import recurring_ical_events
-from icalendar import Calendar
+from icalendar.cal import Calendar, Component
 from recurring_ical_events import CalendarQuery
 
 from . import parse
@@ -51,6 +51,20 @@ class ComponentsResultArgument(click.File):
         return ComponentsResult(file)
 
 
+class JoinedCalendars:
+
+    def __init__(self, calendars:list[Calendar]):
+        """Join multiple calendars."""
+        self.queries = [
+            recurring_ical_events.of(calendar)
+            for calendar in calendars
+        ]
+
+    def at(self, dt: tuple[int]) -> t.Generator[Component]:
+        """Return the components."""
+        for query in self.queries:
+            yield from query.at(dt)
+
 class CalendarQueryInputArgument(click.File):
     """Argument for the result."""
 
@@ -62,8 +76,8 @@ class CalendarQueryInputArgument(click.File):
     ) -> recurring_ical_events.CalendarQuery:
         """Return a CalendarQuery."""
         file = super().convert(value, param, ctx)
-        calendar = Calendar.from_ical(file.read())
-        return recurring_ical_events.of(calendar)
+        calendars = Calendar.from_ical(file.read(), multiple=True)
+        return JoinedCalendars(calendars)
 
 
 arg_calendar = click.argument("calendar", type=CalendarQueryInputArgument("rb"))
