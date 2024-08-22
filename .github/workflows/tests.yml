@@ -109,5 +109,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          body: "For a list of changes, please refer to the [Changelog](https://open-web-calendar.quelltext.eu/changelog/)."
+          body: "For a list of changes, please refer to the [Changelog](https://github.com/niccokunzmann/ics-query#changelog)."
           generateReleaseNotes: false
