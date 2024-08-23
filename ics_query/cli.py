@@ -9,11 +9,12 @@ import typing as t
 
 import click
 import recurring_ical_events
+import zoneinfo
 from icalendar.cal import Calendar, Component
 
 from . import parse
+from . query import Query
 from .version import cli_version
-import zoneinfo
 
 if t.TYPE_CHECKING:
     from io import FileIO
@@ -57,10 +58,10 @@ class ComponentsResultArgument(click.File):
 
 
 class JoinedCalendars:
-    def __init__(self, calendars: list[Calendar], components: t.Sequence[str]):
+    def __init__(self, calendars: list[Calendar], timezone:str, components: t.Sequence[str]):
         """Join multiple calendars."""
         self.queries = [
-            recurring_ical_events.of(calendar, components=components)
+            Query(calendar, timezone, components=components)
             for calendar in calendars
         ]
 
@@ -101,7 +102,8 @@ class CalendarQueryInputArgument(click.File):
         file = super().convert(value, param, ctx)
         calendars = Calendar.from_ical(file.read(), multiple=True)
         components = ctx.params.get("component", ("VEVENT", "VTODO", "VJOURNAL"))
-        return JoinedCalendars(calendars, components=components)
+        timezone = ctx.params.get("tz", "")
+        return JoinedCalendars(calendars, timezone, components)
 
 
 opt_components = click.option(
@@ -115,21 +117,30 @@ opt_components = click.option(
     ),
 )
 
+opt_timezone = click.option(
+    "--tz",
+    help=(
+        "Set the timezone. See also --available-timezones"
+    ),
+)
+
 
 def arg_calendar(func):
     """Decorator for a calendar argument with all used options."""
     arg = click.argument("calendar", type=CalendarQueryInputArgument("rb"))
 
     @functools.wraps(func)
-    def wrapper(*args, component=(), **kw):  # noqa: ARG001
+    def wrapper(*args, component=(), tz="", **kw):  # noqa: ARG001
         """Remove some parameters."""
         return func(*args, **kw)
-    return opt_components(arg(wrapper))
+
+    return opt_timezone(opt_components(arg(wrapper)))
 
 
-arg_output = click.argument("output", type=ComponentsResultArgument("wb"))
+arg_output = click.argument("output", type=ComponentsResultArgument("wb"), default="-")
 # Option with many values and list as result
 # see https://click.palletsprojects.com/en/latest/options/#multiple-options
+
 
 def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
     """Add a ``--help`` option which immediately prints the help page
@@ -216,8 +227,32 @@ def main():
     While the calendar entries might use their own timezone definitions,
     the timezone parameters of ics-query use the timezone definitions of
     Python's tzdata package.
+
+    You can list all timezones available with this command:
+
+    \b
+        ics-query --available-timezones
+
+    By default the local time of the timezone is assumed:
     
-    You can list all timezones available with ics-query --available-timezones.
+    \b
+        $ ics-query at 2024-08-20 Berlin-Los-Angeles.ics - | grep -E 'DTSTART|SUMMARY'
+        SUMMARY:6:00-7:00 Europe/Berlin 20th August
+        DTSTART;TZID=Europe/Berlin:20240820T060000
+        SUMMARY:6:00-7:00 Amerika/Los Angeles 20th August
+        DTSTART;TZID=America/Los_Angeles:20240820T060000
+
+    If you however wish to get all events in a certain timezone, use the --tz parameter:
+
+    \b
+        $ ics-query at --tz=Europe/Berlin 2024-08-20 Berlin-Los-Angeles.ics - \\
+            | grep -E 'DTSTART|SUMMARY'
+        SUMMARY:6:00-7:00 Europe/Berlin 20th August
+        DTSTART;TZID=Europe/Berlin:20240820T060000
+        SUMMARY:21:00-22:00 Amerika/Los Angeles 19th August
+        DTSTART;TZID=Europe/Berlin:20240820T060000
+        SUMMARY:6:00-7:00 Amerika/Los Angeles 20th August
+        DTSTART;TZID=Europe/Berlin:20240820T150000
 
     \b
     Components
@@ -226,6 +261,7 @@ def main():
     We support different types of recurring components: VEVENT, VTODO, VJOURNAL.
     You can specify which can be in the result using the --component parameter.
     """  # noqa: D301
+
 
 pass_datetime = click.make_pass_decorator(parse.to_time)
 
