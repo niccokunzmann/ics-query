@@ -18,3 +18,13 @@ def test_version(run):
     result = run("--version")
     assert result.exit_code == 0
     assert version in result.output
+
+
+def test_timezones(run):
+    """Check the available timezones."""
+    result = run("--available-timezones")
+    tz = result.output.split()
+    assert result.exit_code == 0
+    assert tz.index("Zulu") > tz.index("Pacific/Nauru")
+    assert tz.index("Pacific/Nauru") > tz.index("UTC")
+    assert tz.index("UTC") > tz.index("localtime")

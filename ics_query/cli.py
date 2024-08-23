@@ -13,6 +13,7 @@ from icalendar.cal import Calendar, Component
 
 from . import parse
 from .version import cli_version
+import zoneinfo
 
 if t.TYPE_CHECKING:
     from io import FileIO
@@ -130,9 +131,46 @@ arg_output = click.argument("output", type=ComponentsResultArgument("wb"))
 # Option with many values and list as result
 # see https://click.palletsprojects.com/en/latest/options/#multiple-options
 
+def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
+    """Add a ``--help`` option which immediately prints the help page
+    and exits the program.
+
+    This is usually unnecessary, as the ``--help`` option is added to
+    each command automatically unless ``add_help_option=False`` is
+    passed.
+
+    :param param_decls: One or more option names. Defaults to the single
+        value ``"--help"``.
+    :param kwargs: Extra arguments are passed to :func:`option`.
+    """
+
+    def callback(ctx: click.Context, param: click.Parameter, value: bool) -> None:
+        if not value or ctx.resilient_parsing:
+            return
+
+        first_zones = ["localtime", "UTC"]
+        all_zones = zoneinfo.available_timezones()
+        for zone in first_zones:
+            if zone in all_zones:
+                click.echo(zone)
+        for zone in sorted(all_zones, key=str.lower):
+            click.echo(zone)
+        ctx.exit()
+
+    if not param_decls:
+        param_decls = ("--available-timezones",)
+
+    kwargs.setdefault("is_flag", True)
+    kwargs.setdefault("expose_value", False)
+    kwargs.setdefault("is_eager", True)
+    kwargs.setdefault("help", "List all available timezones and exit.")
+    kwargs["callback"] = callback
+    return click.option(*param_decls, **kwargs)
+
 
 @click.group()
 @click.version_option(cli_version)
+@opt_available_timezones()
 def main():
     """Find out what happens in ICS calendar files.
 
@@ -174,14 +212,20 @@ def main():
     Timezones
     ---------
 
+    We have several timezones available to choose from.
+    While the calendar entries might use their own timezone definitions,
+    the timezone parameters of ics-query use the timezone definitions of
+    Python's tzdata package.
+    
+    You can list all timezones available with ics-query --available-timezones.
+
     \b
     Components
     ----------
 
-    We support different types of recurring compnents: VEVENT, VTODO, VJOURNAL.
+    We support different types of recurring components: VEVENT, VTODO, VJOURNAL.
     You can specify which can be in the result using the --component parameter.
     """  # noqa: D301
-
 
 pass_datetime = click.make_pass_decorator(parse.to_time)
 
@@ -191,7 +235,7 @@ pass_datetime = click.make_pass_decorator(parse.to_time)
 @arg_calendar
 @arg_output
 def at(calendar: JoinedCalendars, output: ComponentsResult, date: Date):
-    """Occurrences at a certain dates.
+    """Print occurrences at a certain date or time.
 
     YEAR
 
@@ -317,7 +361,9 @@ def at(calendar: JoinedCalendars, output: ComponentsResult, date: Date):
 @arg_calendar
 @arg_output
 def first(calendar: JoinedCalendars, output: ComponentsResult):
-    """Print only the first occurrence in each calendar.
+    """Print only the first occurrence.
+
+    This prints the first occurrence in each calendar that is given.
 
     \b
     This example prints the first event in calendar.ics:
@@ -363,7 +409,7 @@ def between(
     calendar: JoinedCalendars,
     output: ComponentsResult,
 ):
-    """Print all occurrences between the START and the END.
+    """Print occurrences between a START and an END.
 
     The start is inclusive, the end is exclusive.
 
