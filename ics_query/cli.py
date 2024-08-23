@@ -242,17 +242,22 @@ def main():
         SUMMARY:6:00-7:00 Amerika/Los Angeles 20th August
         DTSTART;TZID=America/Los_Angeles:20240820T060000
 
-    If you however wish to get all events in a certain timezone, use the --tz parameter:
+    If you however wish to get all events in a certain timezone, use the --tz parameter.
+    In this example, the event that happens at the 19th of August at 21:00 in Los Angeles
+    is actually happening on the 20th in local Berlin time.
 
     \b
         $ ics-query at --tz=Europe/Berlin 2024-08-20 Berlin-Los-Angeles.ics - \\
             | grep -E 'DTSTART|SUMMARY'
         SUMMARY:6:00-7:00 Europe/Berlin 20th August
         DTSTART;TZID=Europe/Berlin:20240820T060000
-        SUMMARY:21:00-22:00 Amerika/Los Angeles 19th August
-        DTSTART;TZID=Europe/Berlin:20240820T060000
         SUMMARY:6:00-7:00 Amerika/Los Angeles 20th August
         DTSTART;TZID=Europe/Berlin:20240820T150000
+        SUMMARY:21:00-22:00 Amerika/Los Angeles 19th August
+        DTSTART;TZID=Europe/Berlin:20240820T060000
+
+    If you wish to get events in your local time, use --tz localtime.
+    If you like UTC, use --tz UTC.
 
     \b
     Components
