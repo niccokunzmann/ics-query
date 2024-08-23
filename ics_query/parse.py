@@ -63,13 +63,10 @@ def to_time_and_delta(dt: str) -> DateAndDelta:
     parsed_td = REGEX_TIMEDELTA.match(dt)
     if parsed_td is None:
         return to_time(dt)
-    kw = {
-        k:int(v)
-        for k, v in parsed_td.groupdict().items()
-        if v is not None
-    }
+    kw = {k: int(v) for k, v in parsed_td.groupdict().items() if v is not None}
     if not kw:
         raise InvalidTimeFormat(dt)
     return datetime.timedelta(**kw)
+
 
 __all__ = ["to_time", "Date", "to_time_and_delta", "DateAndDelta"]

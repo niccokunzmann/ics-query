@@ -10,7 +10,6 @@ import typing as t
 import click
 import recurring_ical_events
 from icalendar.cal import Calendar, Component
-from recurring_ical_events import CalendarQuery
 
 from . import parse
 from .version import __version__
@@ -35,7 +34,7 @@ class ComponentsResult:
     def add_component(self, component: Component):
         """Return a component."""
         self._file.write(component.to_ical())
-    
+
     def add_components(self, components: t.Iterable[Component]):
         """Add all components."""
         for component in components:
@@ -73,9 +72,12 @@ class JoinedCalendars:
                 yield component
                 break
 
-    def between(self, start: parse.Date, end: parse.DateAndDelta) -> t.Generator[Component]:
+    def between(
+        self, start: parse.Date, end: parse.DateAndDelta
+    ) -> t.Generator[Component]:
         for query in self.queries:
             yield from query.between(start, end)
+
 
 class CalendarQueryInputArgument(click.File):
     """Argument for the result."""
@@ -281,7 +283,7 @@ def first(calendar: JoinedCalendars, output: ComponentsResult):
     This example prints the first event in calendar.ics:
     \b
         ics-query first calendar.ics -
-    
+
     """  # noqa: D301
     output.add_components(calendar.first())
 
@@ -291,39 +293,44 @@ def first(calendar: JoinedCalendars, output: ComponentsResult):
 @click.argument("end", type=parse.to_time_and_delta)
 @arg_calendar
 @arg_output
-def between(start: parse.Date, end: parse.DateAndDelta, calendar: JoinedCalendars, output: ComponentsResult):
+def between(
+    start: parse.Date,
+    end: parse.DateAndDelta,
+    calendar: JoinedCalendars,
+    output: ComponentsResult,
+):
     """Print all occurrences between the START and the END.
-    
+
     The start is inclusive, the end is exclusive.
-    
+
     This example returns the events within the next week:
-    
+
     \b
         ics-query between `date +%Y%m%d` +7d calendar.ics -
 
     This example saves the events from the 1st of May 2024 to the 10th of June in
     events.ics:
-    
+
     \b
         ics-query between 2024-5-1 2024-6-10 calendar.ics events.ics
-    
+
     In this example, you can check what is happening on New Years Eve 2025 around
     midnight:
-    
+
     \b
         ics-query between 2025-12-31T21:00 +6h calendar.ics events.ics
-    
+
     \b
     Absolute Time
     -------------
-    
+
     START must be specified as an absolute time.
     END can be absolute or relative to START, see Relative Time below.
-    
+
     Each of the formats specify the earliest time e.g. the start of a day.
     Thus, if START == END, there are 0 seconds in between and the result is
     only what happens during that time or starts exactly at that time.
-    
+
     YEAR
 
         Specifiy the start of the year.
@@ -447,7 +454,7 @@ def between(start: parse.Date, end: parse.DateAndDelta, calendar: JoinedCalendar
 
     The END argument can be a time range.
     The + at the beginning is optional but makes for a better reading.
-    
+
     \b
     Examples:
     \b
@@ -460,7 +467,7 @@ def between(start: parse.Date, end: parse.DateAndDelta, calendar: JoinedCalendar
     You can also combine the ranges:
     Add 1 day and 12 hours to START: +1d12h
     Add 3 hours and 15 minutes to START: +3h15m
-    
+
     """  # noqa: D301
     output.add_components(calendar.between(start, end))
 
