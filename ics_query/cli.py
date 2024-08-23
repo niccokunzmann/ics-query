@@ -56,9 +56,12 @@ class ComponentsResultArgument(click.File):
 
 
 class JoinedCalendars:
-    def __init__(self, calendars: list[Calendar], components:t.Sequence[str]):
+    def __init__(self, calendars: list[Calendar], components: t.Sequence[str]):
         """Join multiple calendars."""
-        self.queries = [recurring_ical_events.of(calendar, components=components) for calendar in calendars]
+        self.queries = [
+            recurring_ical_events.of(calendar, components=components)
+            for calendar in calendars
+        ]
 
     def at(self, dt: tuple[int]) -> t.Generator[Component]:
         """Return the components."""
@@ -105,14 +108,20 @@ opt_components = click.option(
         "Possible values are: VEVENT, VTODO, VJOURNAL. "
     ),
 )
+
+
 def arg_calendar(func):
     """Decorator for a calendar argument with all used options."""
     arg = click.argument("calendar", type=CalendarQueryInputArgument("rb"))
+
     @functools.wraps(func)
-    def wrapper(*args, component=(), **kw):
+    def wrapper(*args, component=(), **kw):  # noqa: ARG001
         """Remove some parameters."""
         return func(*args, **kw)
+
     return opt_components(arg(wrapper))
+
+
 arg_output = click.argument("output", type=ComponentsResultArgument("wb"))
 # Option with many values and list as result
 # see https://click.palletsprojects.com/en/latest/options/#multiple-options
@@ -160,11 +169,11 @@ def main():
     \b
     Timezones
     ---------
-    
+
     \b
     Components
     ----------
-    
+
     We support different types of recurring compnents: VEVENT, VTODO, VJOURNAL.
     You can specify which can be in the result using the --component parameter.
     """  # noqa: D301
