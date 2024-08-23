@@ -62,6 +62,14 @@ BEGIN:VEVENT
 ...
 ```
 
+#### Piping calendars
+
+You can pipe one or more calendars into the input.
+
+```shell
+cat calendar.ics | ics-query first -
+```
+
 ### Events at Certain Times
 
 You can query which events happen at certain times:
@@ -78,6 +86,25 @@ Please see the command documentation for more help:
 ics-query at --help
 ics-query --help
 ```
+
+You can get all **events** that happen at a certain **day**.
+
+```shell
+ics-query at --components VEVENT 2029-12-24 calendar.ics
+```
+
+You can get all **events** that happen **today**.
+
+```shell
+ics-query at --components VEVENT `date +%Y-%m-%d` calendar.ics
+```
+
+You can get all **TODO**s that happen at in certain **month**.
+
+```shell
+ics-query at --components VTODO 2029-12-24 calendar.ics
+```
+
 
 ### Events within a Time Span
 
@@ -138,63 +165,13 @@ This example returns the first event of a calendar.
 ics-query first -c VEVENT calendar.ics -
 ```
 
-## Vision
-
-This section shows where we would like to get to.
-
-### `ics-query at` - occurrences at certain times
-
-You can get all **events** that happen at a certain **day**.
-
-```shell
-ics-query --components VEVENT at 2029-12-24 calendar.ics
-```
-
-You can get all **events** that happen **today**.
-
-```shell
-ics-query --components VEVENT at `date +%Y-%m-%d` calendar.ics
-```
-
-You can get all **TODO**s that happen at in certain **month**.
-
-```shell
-ics-query --components VTODO at 2029-12-24 calendar.ics
-```
-
-### `ics-query --select-index` - reduce output size
-
-Examples: `0,2,4` `0-10`
-
 ### `ics-query all` - the whole calendar
 
-### `ics-query --select-uid` - filter by uid
-
-## How to edit an event
-
-To edit a component like an event, you can append it to the calendar and increase the sequence number.
-
-Example:
-
-1. get the first event `--select-index=0` TODO: recurring-ical-events: set recurrence-id, sequence number
-2. change the summary
-3. increase sequence number
-4. add the event to the end of the calendar file
-5. show that the occurrence has changed
-
-## Piping calendars
+You can get everything that is happening in a calendar but that can be a lot!
 
 ```shell
-cat calendar.ics | ics-query --output=count --filter-component=VEVENT all > calendar-event-count.int
+ics-query all calendar.ics
 ```
-
-## Notifications
-
-Examples:
-
-- There are x todos in the next hour
-- There are x events today
-- Please write a journal entry!
 
 ## Version Fixing
 
@@ -304,3 +281,35 @@ To release new versions,
 ## Related Work
 
 - [icalBuddy](https://hasseg.org/icalBuddy/)
+
+## Vision
+
+This section shows where we would like to get to.
+
+### `ics-query --select-index` - reduce output size
+
+Examples: `0,2,4` `0-10`
+
+
+### `ics-query --select-uid` - filter by uid
+
+### How to edit an event
+
+To edit a component like an event, you can append it to the calendar and increase the sequence number.
+
+Example:
+
+1. get the event `--select-index=0`
+2. change the summary
+3. increase sequence number
+4. add the event to the end of the calendar file
+5. show that the occurrence has changed
+
+
+### Notifications
+
+Examples:
+
+- There are x todos in the next hour
+- There are x events today
+- Please write a journal entry!
