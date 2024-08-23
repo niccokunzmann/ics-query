@@ -247,3 +247,8 @@ To release new versions,
 - v0.0.1a
 
   - first version
+
+
+## Related Work
+
+- [icalBuddy](https://hasseg.org/icalBuddy/)
