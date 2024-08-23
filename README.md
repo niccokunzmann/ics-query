@@ -156,20 +156,20 @@ The `+` is optional.
 
 ### Time Span Examples
 
-This example returns the events within the next week:
+This example returns the occurrences within the **next week**:
 
 ```shell
 ics-query between `date +%Y%m%d` +7d calendar.ics -
 ```
 
-This example saves the events from the 1st of May 2024 to the 10th of June in
+This example saves the **events** from the **1st of May 2024 to the 10th of June** in
 events.ics:
 
 ```shell
-ics-query between 2024-5-1 2024-6-10 calendar.ics events.ics
+ics-query between --component VEVENT 2024-5-1 2024-6-10 calendar.ics events.ics
 ```
 
-In this example, you can check what is happening on New Years Eve 2025 around
+In this example, you can check what is happening on **New Years Eve 2025** around
 midnight:
 
 ```shell
@@ -211,6 +211,7 @@ This is also available as `ICS_QUERY_COMPONENT` variable.
 export ICS_QUERY_COMPONENT=VEVENT
 # from now on, you will get only events
 ics-query first calendar.ics
+```
 
 ### Timezones
 
