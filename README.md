@@ -141,26 +141,11 @@ You can get all **TODO**s that happen at in certain **month**.
 ics-query --components VTODO at 2029-12-24 calendar.ics
 ```
 
-### `ics-query at` - time ranges
-
-### `ics-query --output=count` - count occurrences
-
-### `ics-query --output=ics` - use ics as output (default)
-
 ### `ics-query --select-index` - reduce output size
 
 Examples: `0,2,4` `0-10`
 
 ### `ics-query all` - the whole calendar
-
-### `ics-query between` - time ranges
-
-```shell
-ics-query between dt dt
-ics-query between dt duration
-```
-
-### `ics-query --select-component` - filter for components
 
 ### `ics-query --select-uid` - filter by uid
 

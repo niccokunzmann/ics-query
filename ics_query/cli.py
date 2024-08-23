@@ -12,7 +12,7 @@ import recurring_ical_events
 from icalendar.cal import Calendar, Component
 
 from . import parse
-from .version import __version__
+from .version import cli_version
 
 if t.TYPE_CHECKING:
     from io import FileIO
@@ -99,7 +99,7 @@ arg_output = click.argument("output", type=ComponentsResultArgument("wb"))
 
 
 @click.group()
-@click.version_option(__version__)
+@click.version_option(cli_version)
 def main():
     """Find out what happens in ICS calendar files.
 

@@ -27,15 +27,9 @@ assignees: ''
 
 **Version:**
 <!-- Which Version do you use? -->
-v0.0.1
 
-<!-- Sometimes, the problems are in other packages. You can provide an overview
-     by running this command and passing the output:
-
-     pip list
--->
 ```shell
-pip list
+$ ics-query --version
 ```
 
 ## Additional context
