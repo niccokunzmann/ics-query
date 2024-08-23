@@ -8,22 +8,24 @@ import sys
 import typing as t
 
 import click
-import recurring_ical_events
 import zoneinfo
 from icalendar.cal import Calendar, Component
 
 from . import parse
-from . query import Query
+from .query import Query
 from .version import cli_version
 
 if t.TYPE_CHECKING:
     from io import FileIO
 
+    import recurring_ical_events
     from icalendar.cal import Component
 
     from .parse import Date
 
 print = functools.partial(print, file=sys.stderr)  # noqa: A001
+
+ENV_PREFIX = "ICS_QUERY"
 
 
 class ComponentsResult:
@@ -58,11 +60,12 @@ class ComponentsResultArgument(click.File):
 
 
 class JoinedCalendars:
-    def __init__(self, calendars: list[Calendar], timezone:str, components: t.Sequence[str]):
+    def __init__(
+        self, calendars: list[Calendar], timezone: str, components: t.Sequence[str]
+    ):
         """Join multiple calendars."""
         self.queries = [
-            Query(calendar, timezone, components=components)
-            for calendar in calendars
+            Query(calendar, timezone, components=components) for calendar in calendars
         ]
 
     def at(self, dt: tuple[int]) -> t.Generator[Component]:
@@ -110,6 +113,7 @@ opt_components = click.option(
     "--component",
     "-c",
     multiple=True,
+    envvar=ENV_PREFIX + "_COMPONENT",
     help=(
         "Select the components which can be returned. "
         "By default all supported components can be in the result. "
@@ -119,9 +123,8 @@ opt_components = click.option(
 
 opt_timezone = click.option(
     "--tz",
-    help=(
-        "Set the timezone. See also --available-timezones"
-    ),
+    envvar=ENV_PREFIX + "_TZ",
+    help=("Set the timezone. See also --available-timezones"),
 )
 
 
@@ -155,7 +158,7 @@ def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
     :param kwargs: Extra arguments are passed to :func:`option`.
     """
 
-    def callback(ctx: click.Context, param: click.Parameter, value: bool) -> None:
+    def callback(ctx: click.Context, param: click.Parameter, value: bool) -> None:  # noqa: FBT001, ARG001
         if not value or ctx.resilient_parsing:
             return
 
@@ -182,7 +185,7 @@ def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
 @click.group()
 @click.version_option(cli_version)
 @opt_available_timezones()
-def main():
+def cli():
     """Find out what happens in ICS calendar files.
 
     ics-query can query and filter RFC 5545 compatible .ics files.
@@ -233,8 +236,10 @@ def main():
     \b
         ics-query --available-timezones
 
-    By default the local time of the timezone is assumed:
-    
+    By default the local time of the components is assumed.
+    In this example, two events happen at 6am, one in Berlin and one in Los Angeles.
+    Both are hours apart though.
+
     \b
         $ ics-query at 2024-08-20 Berlin-Los-Angeles.ics - | grep -E 'DTSTART|SUMMARY'
         SUMMARY:6:00-7:00 Europe/Berlin 20th August
@@ -243,8 +248,8 @@ def main():
         DTSTART;TZID=America/Los_Angeles:20240820T060000
 
     If you however wish to get all events in a certain timezone, use the --tz parameter.
-    In this example, the event that happens at the 19th of August at 21:00 in Los Angeles
-    is actually happening on the 20th in local Berlin time.
+    In this example, the event that happens at the 19th of August at 21:00 in
+    Los Angeles is actually happening on the 20th in local Berlin time.
 
     \b
         $ ics-query at --tz=Europe/Berlin 2024-08-20 Berlin-Los-Angeles.ics - \\
@@ -259,19 +264,26 @@ def main():
     If you wish to get events in your local time, use --tz localtime.
     If you like UTC, use --tz UTC.
 
+    You can also set the environment variable ICS_QUERY_TZ to the timezone instead of
+    passing --tz.
+
     \b
     Components
     ----------
 
     We support different types of recurring components: VEVENT, VTODO, VJOURNAL.
     You can specify which can be in the result using the --component parameter.
+
+    You can also set the environment variable ICS_QUERY_COMPONENT to the timezone
+    instead of passing --component.
+
     """  # noqa: D301
 
 
 pass_datetime = click.make_pass_decorator(parse.to_time)
 
 
-@main.command()
+@cli.command()
 @click.argument("date", type=parse.to_time)
 @arg_calendar
 @arg_output
@@ -398,7 +410,7 @@ def at(calendar: JoinedCalendars, output: ComponentsResult, date: Date):
     output.add_components(calendar.at(date))
 
 
-@main.command()
+@cli.command()
 @arg_calendar
 @arg_output
 def first(calendar: JoinedCalendars, output: ComponentsResult):
@@ -415,7 +427,7 @@ def first(calendar: JoinedCalendars, output: ComponentsResult):
     output.add_components(calendar.first())
 
 
-@main.command()
+@cli.command()
 @arg_calendar
 @arg_output
 def all(calendar: JoinedCalendars, output: ComponentsResult):  # noqa: A001
@@ -439,7 +451,7 @@ def all(calendar: JoinedCalendars, output: ComponentsResult):  # noqa: A001
     output.add_components(calendar.all())
 
 
-@main.command()
+@cli.command()
 @click.argument("start", type=parse.to_time)
 @click.argument("end", type=parse.to_time_and_delta)
 @arg_calendar
@@ -623,4 +635,9 @@ def between(
     output.add_components(calendar.between(start, end))
 
 
-__all__ = ["main"]
+def main():
+    """Run the program."""
+    cli(auto_envvar_prefix=ENV_PREFIX)
+
+
+__all__ = ["main", "ENV_PREFIX", "cli"]
