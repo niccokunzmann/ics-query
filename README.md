@@ -266,10 +266,15 @@ To release new versions,
 
 ## Changelog
 
+- v0.2.0a
+
+  - Add `ics-query first <calendar> <output>` for earliest occurrences
+  - Add `ics-query between <span_start> <span_stop> <calendar> <output>` to query time ranges
+
 - v0.1.1a
 
   - Add `--version`
-  - Add `ics-query at <date>`
+  - Add `ics-query at <date> <calendar> <output>`
   - Add support for multiple calendars in one input
 
 - v0.1.0a
