@@ -1,0 +1,12 @@
+BEGIN:VJOURNAL
+CATEGORIES:FAMILY,FINANCE
+CLASS:CONFIDENTIAL
+DESCRIPTION:We made it this year too.  Probably.  What's the point of a re
+ curring journal entry?  Journals are supposed to describe past events\, ar
+ en't they?
+DTSTAMP:19920901T130000Z
+DTSTART;VALUE=DATE:19920420
+PRIORITY:1
+SUMMARY:Yearly Income Tax Report
+UID:19920901T130000Z-123409@host.com
+END:VJOURNAL

@@ -9,6 +9,7 @@ def test_check_program_output(io_testcase: IOTestCase):
     """Run the test case and check the output."""
     result = io_testcase.run()
     print(result.error)
+    assert result.exit_code == 0, "The process must not exist with an error."
     assert result.output == io_testcase.expected_output
 
 
