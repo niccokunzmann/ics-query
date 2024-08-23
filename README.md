@@ -19,8 +19,8 @@ This section walks you though the different functionalities.
 
 ### Examples
 
-You can easily get a calendar from the web and see what is on.
-In this example, we show which German National Holidays happen in August 2024:
+You can get a calendar from the web and see what is on.
+In this example, we show which German National Holidays happening in August 2024:
 
 ```shell
 $ wget -qO- 'https://www.calendarlabs.com/ical-calendar/ics/46/Germany_Holidays.ics' | ./ics-query at 2024-08 - -
@@ -111,7 +111,7 @@ You can get all **events** that happen **today**.
 ics-query at --components VEVENT `date +%Y-%m-%d` calendar.ics
 ```
 
-You can get all **TODO**s that happen at in certain **month**.
+You can get all **TODO**s that happen in a certain **month**.
 
 ```shell
 ics-query at --components VTODO 2029-12-24 calendar.ics
@@ -188,7 +188,7 @@ ics-query all calendar.ics
 
 ### Filtering Components
 
-We support different component types: VEVENT, VJOURNAL and VTODO.
+We support different component types: `VEVENT`, `VJOURNAL` and `VTODO`.
 By default, we include all types in the result.
 
 You can specify which components you would like to get using the
@@ -207,13 +207,20 @@ This example returns the first event of a calendar.
 ics-query first -c VEVENT calendar.ics -
 ```
 
-This is also available as `ICS_QUERY_COMPONENT` variable.
+This option is also available as `ICS_QUERY_COMPONENT` variable.
 
 ```shell
 export ICS_QUERY_COMPONENT=VEVENT
 # from now on, you will get only events
 ics-query first calendar.ics
 ```
+
+Please see the command documentation for more help:
+
+```shell
+ics-query --help
+```
+
 
 ### Timezones
 
@@ -258,6 +265,12 @@ For all avaiable timezones see:
 ics-query --available-timezones
 ```
 
+Please see the command documentation for more help:
+
+```shell
+ics-query --help
+```
+
 ## Version Fixing
 
 If you use this library in your code, you may want to make sure that
@@ -273,7 +286,7 @@ while `b` and `c` can change.
 
 ## Development
 
-This section should set you up for development.
+This section should set you up for developing `ics-query`.
 
 ### Testing
 
