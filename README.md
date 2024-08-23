@@ -117,6 +117,27 @@ midnight:
 ics-query between 2025-12-31T21:00 +6h calendar.ics events.ics
 ```
 
+### Filtering Components
+
+We support different component types: VEVENT, VJOURNAL and VTODO.
+By default, we include all types in the result.
+
+You can specify which components you would like to get using the
+`--component` or `-c` parameter.
+
+```shell
+-c VEVENT   # only events
+-c VTODO    # only TODOs
+-c VJOURNAL # only journal entries
+-c VEVENT -v VTODO # only events and journal entries
+```
+
+This example returns the first event of a calendar.
+
+```shell
+ics-query first -c VEVENT calendar.ics -
+```
+
 ## Vision
 
 This section shows where we would like to get to.
