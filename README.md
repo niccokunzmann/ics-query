@@ -75,8 +75,46 @@ ics-query at <date-time> calendar.ics -
 Please see the command documentation for more help:
 
 ```shell
-ics-query --help
 ics-query at --help
+ics-query --help
+```
+
+### Events within a Time Span
+
+You can query which events happen between certain times:
+
+```shell
+ics-query between <start> <end> calendar.ics -
+ics-query between <start> <duration> calendar.ics -
+```
+
+Please see the command documentation for more help:
+
+```shell
+ics-query between --help
+ics-query --help
+```
+
+### Time Span Examples
+
+This example returns the events within the next week:
+
+```shell
+ics-query between `date +%Y%m%d` +7d calendar.ics -
+```
+
+This example saves the events from the 1st of May 2024 to the 10th of June in
+events.ics:
+
+```shell
+ics-query between 2024-5-1 2024-6-10 calendar.ics events.ics
+```
+
+In this example, you can check what is happening on New Years Eve 2025 around
+midnight:
+
+```shell
+ics-query between 2025-12-31T21:00 +6h calendar.ics events.ics
 ```
 
 ## Vision
@@ -105,12 +143,9 @@ ics-query --components VTODO at 2029-12-24 calendar.ics
 
 ### `ics-query at` - time ranges
 
-
 ### `ics-query --output=count` - count occurrences
 
-
 ### `ics-query --output=ics` - use ics as output (default)
-
 
 ### `ics-query --select-index` - reduce output size
 
@@ -127,9 +162,7 @@ ics-query between dt duration
 
 ### `ics-query --select-component` - filter for components
 
-
 ### `ics-query --select-uid` - filter by uid
-
 
 ## How to edit an event
 
@@ -247,7 +280,6 @@ To release new versions,
 - v0.0.1a
 
   - first version
-
 
 ## Related Work
 
