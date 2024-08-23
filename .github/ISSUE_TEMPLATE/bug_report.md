@@ -39,5 +39,5 @@ $ ics-query --version
 <!-- If possible, suggest a way of solving this or just let this text down there remain as it is. -->
 
 - [ ] add an ICS file in `ics_query/tests/runs/calendars`
-- [ ] add a test in `ics_query/tests/runs directory`
+- [ ] add a test in `ics_query/tests/runs`
 - [ ] fix the bug and ensure the test code passes
