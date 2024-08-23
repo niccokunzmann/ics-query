@@ -75,10 +75,20 @@ cat calendar.ics | ics-query first -
 You can query which events happen at certain times:
 
 ```shell
-ics-query at <date-time> calendar.ics -
+ics-query at TIME calendar.ics -
 ```
 
-`<date-time>` can be built up: It can be a year, a month, a day, an hour, a minute or a second.
+The format of TIME:
+
+| TIME | description |
+| ------- | ----------- |
+| `2019`    | the whole year 2019 |
+| `2019-08` | August 2019 |
+| `2019-08-12` | 12th of August 2019 |
+| `2019-08-12T17` | 17:00-18:00 at the 12th of August 2019 |
+| `2019-08-12T17:20` | 17:20-17:21 at the 12th of August 2019 |
+| `2019-08-12T17:20:00` | 17:20 at the 12th of August 2019 |
+
 
 Please see the command documentation for more help:
 
@@ -105,14 +115,13 @@ You can get all **TODO**s that happen at in certain **month**.
 ics-query at --components VTODO 2029-12-24 calendar.ics
 ```
 
-
 ### Events within a Time Span
 
 You can query which events happen between certain times:
 
 ```shell
-ics-query between <start> <end> calendar.ics -
-ics-query between <start> <duration> calendar.ics -
+ics-query between START END calendar.ics -
+ics-query between START DURATION calendar.ics -
 ```
 
 Please see the command documentation for more help:
@@ -121,6 +130,29 @@ Please see the command documentation for more help:
 ics-query between --help
 ics-query --help
 ```
+
+The format of START and END with examples:
+
+| START or END | Description |
+| ------- | ----------- |
+| `2019`    | the whole year 2019 |
+| `2019-08` | August 2019 |
+| `2019-08-12` | 12th of August 2019 |
+| `2019-08-12T17` | 17:00-18:00 at the 12th of August 2019 |
+| `2019-08-12T17:20` | 17:20-17:21 at the 12th of August 2019 |
+| `2019-08-12T17:20:00` | 17:20 at the 12th of August 2019 |
+
+Instead of an absolute time, you can specify a duration after the START.
+The `+` is optional.
+
+| DURATION | Description |
+| ------- | ----------- |
+| `+1d`   | one more day |
+| `+1h`   | one more hour |
+| `+1m`   | one more minute |
+| `+1s`   | one more second |
+| `+3600s`   | one more hour or 3600 seconds |
+| `+5d10h`   | five more days and 10 more hours |
 
 ### Time Span Examples
 
@@ -144,6 +176,14 @@ midnight:
 ics-query between 2025-12-31T21:00 +6h calendar.ics events.ics
 ```
 
+### `ics-query all` - the whole calendar
+
+You can get everything that is happening in a calendar but that can be a lot!
+
+```shell
+ics-query all calendar.ics
+```
+
 ### Filtering Components
 
 We support different component types: VEVENT, VJOURNAL and VTODO.
@@ -165,12 +205,54 @@ This example returns the first event of a calendar.
 ics-query first -c VEVENT calendar.ics -
 ```
 
-### `ics-query all` - the whole calendar
-
-You can get everything that is happening in a calendar but that can be a lot!
+This is also available as `ICS_QUERY_COMPONENT` variable.
 
 ```shell
-ics-query all calendar.ics
+export ICS_QUERY_COMPONENT=VEVENT
+# from now on, you will get only events
+ics-query first calendar.ics
+
+### Timezones
+
+You can set the timezone of the query, otherwise the event's local timezone is used and you
+might miss events in your own timezone.
+
+The first event at New Year 2000 in its local time:
+
+```shell
+ics-query at 2000-01-01 calendar.ics
+```
+
+The first event at New Year 2000 in your local time:
+
+```shell
+ics-query at --tz=localtime 2000-01-01 calendar.ics
+```
+
+The first event at New Year 2000 in UTC:
+
+```shell
+ics-query at --tz=UTC 2000-01-01 calendar.ics
+```
+
+The first event at New Year 2000 in Berlin time:
+
+```shell
+ics-query at --tz=Europe/Berlin 2000-01-01 calendar.ics
+```
+
+You can also use the `ICS_QUERY_TZ` variable.
+
+```shell
+export ICS_QUERY_TZ=localtime
+# from now on, we use your local time
+ics-query at 2000-01-01 calendar.ics
+```
+
+For all avaiable timezones see:
+
+```shell
+ics-query --available-timezones
 ```
 
 ## Version Fixing
