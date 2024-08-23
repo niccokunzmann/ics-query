@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-import re
 import datetime
+import re
+from typing import Union
 
-DateArgument = tuple[int]
+Date = tuple[int]
+DateAndDelta = Union[Date, datetime.timedelta]
 
 
 class InvalidTimeFormat(ValueError):
@@ -23,7 +25,7 @@ REGEX_TIME = re.compile(
 )
 
 REGEX_TIMEDELTA = re.compile(
-    r"^(?:(?P<days>\d+)d)?"
+    r"^\+?(?:(?P<days>\d+)d)?"
     r"(?:(?P<hours>\d+)h)?"
     r"(?:(?P<minutes>\d+)m)?"
     r"(?:(?P<seconds>\d+)s)?"
@@ -31,13 +33,13 @@ REGEX_TIMEDELTA = re.compile(
 )
 
 
-def to_time(dt: str) -> tuple[int]:
+def to_time(dt: str) -> Date:
     """Parse the time and date."""
     parsed_dt = REGEX_TIME.match(dt)
     if parsed_dt is None:
         raise InvalidTimeFormat(dt)
 
-    def group(group_name: str) -> tuple[int]:
+    def group(group_name: str) -> Date:
         """Return a group's value."""
         result = parsed_dt.group(group_name)
         while result and result[0] not in "0123456789":
@@ -56,17 +58,18 @@ def to_time(dt: str) -> tuple[int]:
     )
 
 
-def to_time_and_delta(dt: str) -> tuple[int] | datetime.timedelta:
+def to_time_and_delta(dt: str) -> DateAndDelta:
     """Parse to a absolute time or timedelta."""
     parsed_td = REGEX_TIMEDELTA.match(dt)
     if parsed_td is None:
         return to_time(dt)
-    print(parsed_td.groupdict())
     kw = {
         k:int(v)
         for k, v in parsed_td.groupdict().items()
         if v is not None
     }
+    if not kw:
+        raise InvalidTimeFormat(dt)
     return datetime.timedelta(**kw)
 
-__all__ = ["to_time", "DateArgument"]
+__all__ = ["to_time", "Date", "to_time_and_delta", "DateAndDelta"]

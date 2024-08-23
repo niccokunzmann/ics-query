@@ -54,6 +54,7 @@ def test_parse_to_date_argument(string_argument, expected_result, parser):
     "dt",
     [
         "",
+        "  ",
         "132",
         "12345",
     ],

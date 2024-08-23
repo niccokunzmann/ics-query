@@ -18,7 +18,8 @@ from ics_query.parse import to_time_and_delta
         ("23h", timedelta(hours=23)),
     ],
 )
-def test_parse_to_date_argument(string_argument, expected_result):
+@pytest.mark.parametrize("plus", ["", "+"])
+def test_parse_to_date_argument(string_argument, expected_result, plus):
     """Check that we can properly parse what is accepted."""
-    result = to_time_and_delta(string_argument)
+    result = to_time_and_delta(plus + string_argument)
     assert result == expected_result
