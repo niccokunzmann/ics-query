@@ -75,6 +75,11 @@ class JoinedCalendars:
                 yield component
                 break
 
+    def all(self) -> t.Generator[Component]:
+        """Return the first events of all calendars."""
+        for query in self.queries:
+            yield from query.all()
+
     def between(
         self, start: parse.Date, end: parse.DateAndDelta
     ) -> t.Generator[Component]:
@@ -118,7 +123,6 @@ def arg_calendar(func):
     def wrapper(*args, component=(), **kw):  # noqa: ARG001
         """Remove some parameters."""
         return func(*args, **kw)
-
     return opt_components(arg(wrapper))
 
 
@@ -318,10 +322,34 @@ def first(calendar: JoinedCalendars, output: ComponentsResult):
     \b
     This example prints the first event in calendar.ics:
     \b
-        ics-query first calendar.ics -
+        ics-query first --component VEVENT calendar.ics -
 
     """  # noqa: D301
     output.add_components(calendar.first())
+
+
+@main.command()
+@arg_calendar
+@arg_output
+def all(calendar: JoinedCalendars, output: ComponentsResult):  # noqa: A001
+    """Print all occurrences in a calendar.
+
+    The result is ordered by the start of the occurrences.
+    If you have multiple calendars, the result will contain
+    the occurrences of the first calendar before those of the second calendar
+    and so on.
+
+    \b
+    This example prints all events in calendar.ics:
+    \b
+        ics-query all --component VEVENT calendar.ics -
+
+    Note that calendars can create hundreds of occurrences and especially
+    contain endless repetitions. Use this with care as the output is
+    potentially enourmous. You can mitigate this by closing the OUTPUT
+    when you have enough e.g. with a head command.
+    """  # noqa: D301
+    output.add_components(calendar.all())
 
 
 @main.command()
@@ -342,13 +370,13 @@ def between(
     This example returns the events within the next week:
 
     \b
-        ics-query between `date +%Y%m%d` +7d calendar.ics -
+        ics-query between --component VEVENT `date +%Y%m%d` +7d calendar.ics -
 
     This example saves the events from the 1st of May 2024 to the 10th of June in
     events.ics:
 
     \b
-        ics-query between 2024-5-1 2024-6-10 calendar.ics events.ics
+        ics-query between --component VEVENT 2024-5-1 2024-6-10 calendar.ics events.ics
 
     In this example, you can check what is happening on New Years Eve 2025 around
     midnight:
