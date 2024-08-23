@@ -272,6 +272,10 @@ To release new versions,
 
 ## Changelog
 
+- v0.2.1a
+
+  - Add `--component` to filter component types VEVENT, VJOURNAL and VTODO
+
 - v0.2.0a
 
   - Add `ics-query first <calendar> <output>` for earliest occurrences
