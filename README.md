@@ -13,7 +13,9 @@ pip install ics-query
 
 ## Usage
 
-See how to use `ics-query`.
+`ics-query` is a command line tool that aims to make icalendar occurance calculations
+accessible and easy.
+This section walks you though the different functionalities.
 
 ### Examples
 
