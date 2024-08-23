@@ -272,6 +272,11 @@ To release new versions,
 
 ## Changelog
 
+- v0.3.0b
+
+  - Add `--tz` timezone parameter
+  - Add `ics-query all` to get all occurrences
+
 - v0.2.1a
 
   - Add `--component` to filter component types VEVENT, VJOURNAL and VTODO
