@@ -35,6 +35,11 @@ class ComponentsResult:
     def add_component(self, component: Component):
         """Return a component."""
         self._file.write(component.to_ical())
+    
+    def add_components(self, components: t.Iterable[Component]):
+        """Add all components."""
+        for component in components:
+            self.add_component(component)
 
 
 class ComponentsResultArgument(click.File):
@@ -60,6 +65,13 @@ class JoinedCalendars:
         """Return the components."""
         for query in self.queries:
             yield from query.at(dt)
+    
+    def first(self) -> t.Generator[Component]:
+        """Return the first events of all calendars."""
+        for query in self.queries:
+            for component in query.all():
+                yield component
+                break
 
 
 class CalendarQueryInputArgument(click.File):
@@ -133,7 +145,7 @@ pass_datetime = click.make_pass_decorator(parse.to_time)
 @click.argument("date", type=parse.to_time)
 @arg_calendar
 @arg_output
-def at(calendar: CalendarQuery, output: ComponentsResult, date: DateArgument):
+def at(calendar: JoinedCalendars, output: ComponentsResult, date: DateArgument):
     """Occurrences at a certain dates.
 
     YEAR
@@ -253,8 +265,15 @@ def at(calendar: CalendarQuery, output: ComponentsResult, date: DateArgument):
             ics-query at 19900101235959       # 1st January 1990, 23:59:59
             ics-query at `date +%Y%m%d%H%M%S` # now
     """  # noqa: D301
-    for event in calendar.at(date):
-        output.add_component(event)
+    output.add_components(calendar.at(date))
+
+
+@main.command()
+@arg_calendar
+@arg_output
+def first(calendar: JoinedCalendars, output: ComponentsResult):
+    """Print only the first occurrence in each calendar."""
+    output.add_components(calendar.first())
 
 
 __all__ = ["main"]
