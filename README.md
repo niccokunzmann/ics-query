@@ -218,25 +218,25 @@ ics-query first calendar.ics
 You can set the timezone of the query, otherwise the event's local timezone is used and you
 might miss events in your own timezone.
 
-The first event at New Year 2000 in its local time:
+The first event at New Year 2000 in the **event's local time**:
 
 ```shell
 ics-query at 2000-01-01 calendar.ics
 ```
 
-The first event at New Year 2000 in your local time:
+The first event at New Year 2000 in **your local time**:
 
 ```shell
 ics-query at --tz=localtime 2000-01-01 calendar.ics
 ```
 
-The first event at New Year 2000 in UTC:
+The first event at New Year 2000 in **UTC**:
 
 ```shell
 ics-query at --tz=UTC 2000-01-01 calendar.ics
 ```
 
-The first event at New Year 2000 in Berlin time:
+The first event at New Year 2000 in **Berlin time**:
 
 ```shell
 ics-query at --tz=Europe/Berlin 2000-01-01 calendar.ics
