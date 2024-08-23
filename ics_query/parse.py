@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import datetime
 
 DateArgument = tuple[int]
 
@@ -21,8 +22,16 @@ REGEX_TIME = re.compile(
     r"$"
 )
 
+REGEX_TIMEDELTA = re.compile(
+    r"^(?:(?P<days>\d+)d)?"
+    r"(?:(?P<hours>\d+)h)?"
+    r"(?:(?P<minutes>\d+)m)?"
+    r"(?:(?P<seconds>\d+)s)?"
+    r"$"
+)
 
-def to_time(dt: str) -> DateArgument:
+
+def to_time(dt: str) -> tuple[int]:
     """Parse the time and date."""
     parsed_dt = REGEX_TIME.match(dt)
     if parsed_dt is None:
@@ -46,5 +55,18 @@ def to_time(dt: str) -> DateArgument:
         + group("second")
     )
 
+
+def to_time_and_delta(dt: str) -> tuple[int] | datetime.timedelta:
+    """Parse to a absolute time or timedelta."""
+    parsed_td = REGEX_TIMEDELTA.match(dt)
+    if parsed_td is None:
+        return to_time(dt)
+    print(parsed_td.groupdict())
+    kw = {
+        k:int(v)
+        for k, v in parsed_td.groupdict().items()
+        if v is not None
+    }
+    return datetime.timedelta(**kw)
 
 __all__ = ["to_time", "DateArgument"]

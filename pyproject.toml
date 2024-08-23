@@ -31,7 +31,7 @@ classifiers = [
 
 dependencies = [
     "icalendar",
-    "recurring-ical-events",
+    "recurring-ical-events>=3.2.0,<4",
     "click",
     "icalendar",
 ]

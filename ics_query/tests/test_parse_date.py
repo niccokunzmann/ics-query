@@ -2,7 +2,7 @@
 
 import pytest
 
-from ics_query.parse import InvalidTimeFormat, to_time
+from ics_query.parse import InvalidTimeFormat, to_time, to_time_and_delta
 
 
 @pytest.mark.parametrize(
@@ -43,9 +43,10 @@ from ics_query.parse import InvalidTimeFormat, to_time
         ("20141010183012", (2014, 10, 10, 18, 30, 12)),
     ],
 )
-def test_parse_to_date_argument(string_argument, expected_result):
+@pytest.mark.parametrize("parser", [to_time_and_delta, to_time])
+def test_parse_to_date_argument(string_argument, expected_result, parser):
     """Check that we can properly parse what is accepted."""
-    result = to_time(string_argument)
+    result = parser(string_argument)
     assert result == expected_result
 
 
@@ -57,7 +58,8 @@ def test_parse_to_date_argument(string_argument, expected_result):
         "12345",
     ],
 )
-def test_invalid_time_format(dt: str):
+@pytest.mark.parametrize("parser", [to_time_and_delta, to_time])
+def test_invalid_time_format(dt: str, parser):
     """Check invalid time formats."""
     with pytest.raises(InvalidTimeFormat):
-        to_time(dt)
+        parser(dt)
