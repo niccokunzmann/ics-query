@@ -41,7 +41,7 @@ You can get a calendar from the web and see what is on.
 In this example, we show which German National Holidays happening in August 2024:
 
 ```shell
-$ wget -qO- 'https://www.calendarlabs.com/ical-calendar/ics/46/Germany_Holidays.ics' | ./ics-query at 2024-08 - -
+$ wget -qO- 'https://www.calendarlabs.com/ical-calendar/ics/46/Germany_Holidays.ics' | ics-query at 2024-08 - -
 BEGIN:VEVENT
 SUMMARY:Assumption Day (BY\, SL)
 DTSTART;VALUE=DATE:20240815
