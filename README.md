@@ -397,6 +397,8 @@ To release new versions,
 ## Related Work
 
 - [icalBuddy](https://hasseg.org/icalBuddy/)
+- [Blog Post](https://opencollective.com/open-web-calendar/updates/calendar-calculation-on-the-command-line-ics-query)
+- [#icsquery on mastodon](https://toot.wales/tags/icsquery)
 
 ## Vision
 
