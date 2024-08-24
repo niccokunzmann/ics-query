@@ -1,15 +1,33 @@
 # ics-query
 
+[![GitHub Actions CI](https://github.com/niccokunzmann/ics-query/actions/workflows/tests.yml/badge.svg)][GitHub Actions]
+[![PyPI Version](https://badge.fury.io/py/ics-query.svg)][PyPI]
+[![PyPI Downloads](https://img.shields.io/pypi/dm/ics-query.svg)][PyPI]
+[![Support on Open Collective](https://img.shields.io/opencollective/all/open-web-calendar?label=support%20on%20open%20collective)][Open Collective]
+[![Fund Issues with Polar](https://img.shields.io/github/issues/niccokunzmann/ics-query?logo=github&label=issues%20seek%20funding&color=%230062ff)][Polar]
+
 <!-- Change description also in pyproject.toml -->
 Find out what happens in ICS calendar files - query and filter RFC 5545 compatible `.ics` files for events, journals, TODOs and more.
 
 ## Installation
 
-You can install this package from the [PyPI](https://pypi.org/project/ics-query/).
+You can install this package from the [PyPI].
 
 ```shell
 pip install ics-query
 ```
+
+## Support
+
+- Support using [GitHub Sponsors]
+- Fund specific issues using [Polar]
+- Support using [Open Collective]
+- Support using [thanks.dev]
+
+We accept donations to sustain our work, once or regular.
+Consider donating money to open-source as everyone benefits.
+
+
 
 ## Usage
 
@@ -335,7 +353,7 @@ To release new versions,
 
 1. edit the Changelog Section
 2. create a commit and push it
-3. wait for [GitHub Actions](https://github.com/niccokunzmann/ics-query/actions) to finish the build
+3. wait for [GitHub Actions] to finish the build
 4. create a tag and push it
 
     ```shell
@@ -411,3 +429,10 @@ Examples:
 - There are x todos in the next hour
 - There are x events today
 - Please write a journal entry!
+
+[PyPI]: https://pypi.org/project/ics-query/
+[GitHub Actions]: https://github.com/niccokunzmann/ics-query/actions
+[Open Collective]: https://opencollective.com/open-web-calendar/
+[Polar]: https://polar.sh/niccokunzmann/ics-query
+[GitHub Sponsors]: https://github.com/sponsors/niccokunzmann
+[thanks.dev]: https://thanks.dev
