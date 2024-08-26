@@ -365,6 +365,10 @@ To release new versions,
 
 ## Changelog
 
+- v0.3.1b
+
+  - Add `--license` option
+
 - v0.3.0b
 
   - Add `--tz` timezone parameter
