@@ -59,6 +59,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+
 class ComponentsResult:
     """Output interface for components."""
 
@@ -681,7 +682,6 @@ def between(
 
     """  # noqa: D301
     output.add_components(calendar.between(start, end))
-
 
 
 def main():

@@ -18,13 +18,15 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Sequence
+import zoneinfo
+from typing import TYPE_CHECKING
 
 import x_wr_timezone
-import zoneinfo
 from recurring_ical_events import CalendarQuery, Occurrence
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from icalendar import Calendar
 
 
