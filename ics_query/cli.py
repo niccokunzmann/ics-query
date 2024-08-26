@@ -41,7 +41,23 @@ if t.TYPE_CHECKING:
 print = functools.partial(print, file=sys.stderr)  # noqa: A001
 
 ENV_PREFIX = "ICS_QUERY"
+LICENSE = """
+ics-query
+Copyright (C) 2024 Nicco Kunzmann
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
 
 class ComponentsResult:
     """Output interface for components."""
@@ -161,16 +177,9 @@ arg_output = click.argument("output", type=ComponentsResultArgument("wb"), defau
 
 
 def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
-    """Add a ``--help`` option which immediately prints the help page
-    and exits the program.
+    """List available timezones.
 
-    This is usually unnecessary, as the ``--help`` option is added to
-    each command automatically unless ``add_help_option=False`` is
-    passed.
-
-    :param param_decls: One or more option names. Defaults to the single
-        value ``"--help"``.
-    :param kwargs: Extra arguments are passed to :func:`option`.
+    This is copied from the --help option.
     """
 
     def callback(ctx: click.Context, param: click.Parameter, value: bool) -> None:  # noqa: FBT001, ARG001
@@ -197,9 +206,33 @@ def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
     return click.option(*param_decls, **kwargs)
 
 
+def opt_license(*param_decls: str, **kwargs: t.Any) -> t.Callable:
+    """List available timezones.
+
+    This is copied from the --help option.
+    """
+
+    def callback(ctx: click.Context, param: click.Parameter, value: bool) -> None:  # noqa: FBT001, ARG001
+        if not value or ctx.resilient_parsing:
+            return
+        click.echo(LICENSE)
+        ctx.exit()
+
+    if not param_decls:
+        param_decls = ("--license",)
+
+    kwargs.setdefault("is_flag", True)
+    kwargs.setdefault("expose_value", False)
+    kwargs.setdefault("is_eager", True)
+    kwargs.setdefault("help", "Show the license and exit.")
+    kwargs["callback"] = callback
+    return click.option(*param_decls, **kwargs)
+
+
 @click.group()
 @click.version_option(cli_version)
 @opt_available_timezones()
+@opt_license()
 def cli():
     """Find out what happens in ICS calendar files.
 

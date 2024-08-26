@@ -39,7 +39,8 @@ def test_license(run):
     """Check the version is displayed."""
     result = run("--license")
     assert result.exit_code == 0
-    assert version in result.output
+    assert "Copyright (C) 2024 Nicco Kunzmann" in result.output
+    assert "GNU General Public License" in result.output
 
 
 def test_timezones(run):
