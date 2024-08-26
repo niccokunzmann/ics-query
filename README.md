@@ -216,7 +216,7 @@ You can specify which components you would like to get using the
 -c VEVENT   # only events
 -c VTODO    # only TODOs
 -c VJOURNAL # only journal entries
--c VEVENT -v VTODO # only events and journal entries
+-c VEVENT -c VTODO # only events and journal entries
 ```
 
 This example returns the first event of a calendar.
