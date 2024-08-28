@@ -367,7 +367,8 @@ To release new versions,
 
 - v0.3.2b
 
-  - Fix that `--tz localtime` would use `localtime` as timezone instead of the local timezone name.
+  - Fix that `--tz localtime` would use `localtime` as timezone name instead of the local timezone name.
+  - Fix tests on Windows
 
 - v0.3.1b
 

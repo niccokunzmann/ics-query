@@ -16,6 +16,7 @@
 """Test the commmand line."""
 
 from ics_query.version import version
+from tzlocal import get_localzone_name
 
 from .conftest import IOTestCase
 
@@ -51,3 +52,20 @@ def test_timezones(run):
     assert tz.index("Zulu") > tz.index("Pacific/Nauru")
     assert tz.index("Pacific/Nauru") > tz.index("UTC")
     assert tz.index("UTC") > tz.index("localtime")
+
+
+def test_special_timezones(run):
+    """Make sure we show special timezones first."""
+    result = run("--available-timezones")
+    tz = result.output.split()
+    assert result.exit_code == 0
+    assert tz[0] == "localtime"
+    assert tz[1] == get_localzone_name()
+    assert tz[2] == "UTC"
+
+
+def test_localtime_is_not_in_the_result_string(run):
+    """We do not want 'localtime' to turn up as the result tz name."""
+    result = run("first", "--tz", "localtime", "one-event-without-timezone.ics")
+    assert f"DTSTART;TZID={get_localzone_name()}:201903" in result.output
+    assert f"DTEND;TZID={get_localzone_name()}:201903" in result.output
