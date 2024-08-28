@@ -95,17 +95,17 @@ jobs:
         twine check dist/*
         twine upload dist/*
           
-  artifact-check:
-    name: artifact check
-    runs-on: ubuntu-latest
-    needs:
-      - run-tests
-    steps:
-    - uses: actions/download-artifact@v4
-      with:
-        pattern: dist-*
-        path: dist
-    - run: ls -R dist
+  # artifact-check:
+  #   name: artifact check
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - run-tests
+  #   steps:
+  #   - uses: actions/download-artifact@v4
+  #     with:
+  #       pattern: dist-*
+  #       path: dist
+  #   - run: ls -R dist
   
   github-release:
     name: "Publish GitHub Release"
@@ -128,3 +128,4 @@ jobs:
           allowUpdates: true
           body: "For a list of changes, please refer to the [Changelog](https://github.com/niccokunzmann/ics-query#changelog)."
           generateReleaseNotes: false
+          artifacts: "dist/dist-exe-windows-latest/ics-query.exe"
