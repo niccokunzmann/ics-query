@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import subprocess
-from copy import deepcopy
 from pathlib import Path
 from typing import Callable, NamedTuple
 
@@ -50,14 +49,28 @@ class TestRun(NamedTuple):
         )
 
 
-def run_ics_query(*command, cwd=CALENDARS_DIRECTORY) -> TestRun:
-    """Run ics-qeury with a command."""
-    cmd = ["ics-query", *command]
-    print(" ".join(cmd))
+def get_binary_path(request: pytest.FixtureRequest) -> str:
+    """Return the path to the ics-query command."""
+    command: str = request.config.getoption("--binary")
+    if command == "ics-query":
+        # The default command can be found on the command line
+        return command
+    # we must set the path to be absolute
+    return Path(command).absolute()
+
+
+def run_ics_query(*command, cwd=CALENDARS_DIRECTORY, binary: str) -> TestRun:
+    """Run ics-qeury with a command.
+
+    - cwd is the working directory
+    - binary is the path to the command
+    """
+    cmd = [binary, *command]
+    print(" ".join(map(str, cmd)))
     completed_process = subprocess.run(  # noqa: S603, RUF100
         cmd,  # noqa: S603, RUF100
         capture_output=True,
-        timeout=3,
+        timeout=10,
         check=False,
         cwd=cwd,
     )
@@ -71,35 +84,43 @@ class IOTestCase(NamedTuple):
     command: list[str]
     location: Path
     expected_output: str
+    binary: str
 
     @classmethod
-    def from_path(cls, path: Path) -> IOTestCase:
+    def from_path(cls, path: Path, binary: str) -> IOTestCase:
         """Create a new testcase from the files."""
         expected_output = path.read_text(encoding="UTF-8").replace("\r\n", "\n")
-        return cls(path.name, path.stem.split(), path.parent, expected_output)
+        return cls(path.name, path.stem.split(), path.parent, expected_output, binary)
 
     def run(self) -> TestRun:
         """Run this test case and return the result."""
-        return run_ics_query(*self.command)
+        return run_ics_query(*self.command, binary=self.binary)
 
 
-io_test_cases = [
-    IOTestCase.from_path(test_case_path)
+io_test_case_paths = [
+    test_case_path
     for test_case_path in IO_DIRECTORY.iterdir()
     if test_case_path.is_file()
 ]
 
 
-@pytest.fixture(params=io_test_cases)
-def io_testcase(request) -> IOTestCase:
+@pytest.fixture(params=io_test_case_paths)
+def io_testcase(request: pytest.FixtureRequest) -> IOTestCase:
     """Go though all the IO test cases."""
-    return deepcopy(request.param)
+    path: Path = request.param
+    binary = get_binary_path(request)
+    return IOTestCase.from_path(path, binary)
 
 
 @pytest.fixture
-def run() -> Callable[..., TestRun]:
+def run(request: pytest.FixtureRequest) -> Callable[..., TestRun]:
     """Return a runner function."""
-    return run_ics_query
+
+    def run(*args, **kw):
+        kw["binary"] = get_binary_path(request)
+        return run_ics_query(*args, **kw)
+
+    return run
 
 
 __all__ = ["IOTestCase", "TestRun"]

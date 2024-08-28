@@ -26,6 +26,7 @@ import zoneinfo
 import click
 from icalendar.cal import Calendar, Component
 from tzlocal import get_localzone_name
+
 from . import parse
 from .query import Query
 from .version import cli_version
@@ -189,7 +190,7 @@ def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
         if not value or ctx.resilient_parsing:
             return
 
-        click.echo("localtime") # special local time handle
+        click.echo("localtime")  # special local time handle
         click.echo(get_localzone_name())
         click.echo("UTC")
         all_zones = zoneinfo.available_timezones()

@@ -15,8 +15,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Test the commmand line."""
 
-from ics_query.version import version
 from tzlocal import get_localzone_name
+
+from ics_query.version import version
 
 from .conftest import IOTestCase
 
