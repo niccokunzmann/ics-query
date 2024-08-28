@@ -17,6 +17,8 @@ You can install this package from the [PyPI].
 pip install ics-query
 ```
 
+For **Windows**, you can download `ics-query.exe` from our [Releases].
+
 ## Support
 
 - Support using [GitHub Sponsors]
@@ -369,6 +371,7 @@ To release new versions,
 
   - Fix that `--tz localtime` would use `localtime` as timezone name instead of the local timezone name.
   - Fix tests on Windows
+  - Add Windows .exe build artifact
 
 - v0.3.1b
 
@@ -447,3 +450,4 @@ Examples:
 [Polar]: https://polar.sh/niccokunzmann/ics-query
 [GitHub Sponsors]: https://github.com/sponsors/niccokunzmann
 [thanks.dev]: https://thanks.dev
+[Releases]: https://github.com/niccokunzmann/ics-query/releases
