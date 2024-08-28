@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING
 
 import x_wr_timezone
 from recurring_ical_events import CalendarQuery, Occurrence
+from tzlocal import get_localzone
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -38,7 +39,13 @@ class Query(CalendarQuery):
             components=components,
             skip_bad_series=True,
         )
-        self.timezone = zoneinfo.ZoneInfo(timezone) if timezone else None
+        self.timezone = self.get_timezone(timezone)
+
+    def get_timezone(self, timezone: str) -> datetime.tzinfo | None:
+        """Return the local time tz."""
+        if timezone == "localtime":
+            return get_localzone()
+        return zoneinfo.ZoneInfo(timezone) if timezone else None
 
     def with_timezone(self, dt: datetime.date | datetime.datetime):
         """Add the timezone."""

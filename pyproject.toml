@@ -49,6 +49,7 @@ dependencies = [
     "recurring-ical-events>=3.2.0,<4",
     "click",
     "x-wr-timezone",
+    "tzlocal",
 ]
 
 [project.optional-dependencies]

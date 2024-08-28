@@ -365,6 +365,10 @@ To release new versions,
 
 ## Changelog
 
+- v0.3.2b
+
+  - Fix that `--tz localtime` would use `localtime` as timezone instead of the local timezone name.
+
 - v0.3.1b
 
   - Add `--license` option
