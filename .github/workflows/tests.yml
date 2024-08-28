@@ -14,13 +14,13 @@ jobs:
     strategy:
       matrix:
         config:
-        # [Python version, tox env]
+        # [Python version, tox env, OS]
         - ["3.9",   "py39", "ubuntu-latest"]
         - ["3.10",  "py310", "ubuntu-latest"]
         - ["3.11",  "py311", "ubuntu-latest"]
         - ["3.12",  "py312", "ubuntu-latest"]
         - ["3.9",  "ruff", "ubuntu-latest"]
-        - ["exe",  "ruff", "windows-latest"]
+        - ["3.11",  "exe", "windows-latest"]
 
     runs-on: ${{ matrix.config[2] }}
     name: ${{ matrix.config[1] }}
