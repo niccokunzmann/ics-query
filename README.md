@@ -29,13 +29,30 @@ For **Windows**, you can download `ics-query.exe` from our [Releases].
 We accept donations to sustain our work, once or regular.
 Consider donating money to open-source as everyone benefits.
 
+## Supported Features
 
+This library is based on
+
+- [recurring-ical-events]
+- [icalendar]
+- [x-wr-timezone]
+
+[recurring-ical-events]: https://pypi.org/project/recurring-ical-events/
+[icalendar]: https://pypi.org/project/icalendar/
+[x-wr-timezone]: https://pypi.org/project/x-wr-timezone/
+
+For a list of supported features and RFC compatibility,
+please refer to their documentation, too.
 
 ## Usage
 
 `ics-query` is a command line tool that aims to make icalendar occurance calculations
 accessible and easy.
 This section walks you though the different functionalities.
+
+```shell
+ics-query --help
+```
 
 ### Examples
 
