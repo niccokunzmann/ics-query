@@ -384,6 +384,10 @@ To release new versions,
 
 ## Changelog
 
+- v0.3.3b
+
+  - Update dependencies
+
 - v0.3.2b
 
   - Fix that `--tz localtime` would use `localtime` as timezone name instead of the local timezone name.
