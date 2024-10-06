@@ -45,11 +45,14 @@ classifiers = [
 ]
 
 dependencies = [
-    "icalendar",
-    "recurring-ical-events>=3.2.0,<4",
-    "click",
-    "x-wr-timezone",
-    "tzlocal",
+    "icalendar==6.0.0",
+    "recurring-ical-events==3.3.2",
+    "click==8.1.7",
+    "x-wr-timezone==1.0.1",
+    "tzlocal==5.2",
+    "tzdata==2024.2",
+    "python-dateutil==2.9.0.post0",
+    "six==1.16.0",
 ]
 
 [project.optional-dependencies]
