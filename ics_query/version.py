@@ -27,15 +27,18 @@ Components:
 modules = [
     "recurring-ical-events",
     "icalendar",
-    "pytz",
     "python-dateutil",
+    "pytz",
     "click",
     "tzdata",
     "x-wr-timezone",
 ]
 modules.sort()
 for module in modules:
-    cli_version += f"{module}: {get_version(module)}\n"
+    try:
+        cli_version += f"{module}: {get_version(module)}\n"
+    except ModuleNotFoundError:  # noqa: PERF203
+        cli_version += f"{module}: not installed\n"
 
 __all__ = [
     "__version__",
