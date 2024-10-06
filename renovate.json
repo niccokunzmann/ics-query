@@ -4,9 +4,6 @@
     "config:recommended"
   ],
   "dependencyDashboard": false,
-  "major": {
-    "dependencyDashboardApproval": true
-  },
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true
