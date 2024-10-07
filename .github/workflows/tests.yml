@@ -10,42 +10,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tests:
-    strategy:
-      matrix:
-        config:
-        # [Python version, tox env, OS]
-        - ["3.9",   "py39", "ubuntu-latest"]
-        - ["3.10",  "py310", "ubuntu-latest"]
-        - ["3.11",  "py311", "ubuntu-latest"]
-        - ["3.12",  "py312", "ubuntu-latest"]
-        - ["3.9",  "ruff", "ubuntu-latest"]
-        - ["3.11",  "exe", "windows-latest"]
-
-    runs-on: ${{ matrix.config[2] }}
-    name: ${{ matrix.config[1] }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.config[0] }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
-    - name: Test
-      run: |
-        tox -e ${{ matrix.config[1] }}
-    - uses: actions/upload-artifact@v4
-      with:
-        name: dist-${{ matrix.config[1] }}-${{ matrix.config[2] }}  # dist-exe-windows-latest
-        path: dist
-        if-no-files-found: ignore
-        retention-days: 1
-        compression-level: 0
 
   version:
+    # determine the new version and possibly switch to the new tag that we run on
     name: "Determine a new version"
     if: ${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
@@ -70,13 +37,19 @@ jobs:
         id: version
         run: |
           if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            TAG="${{ steps.get-latest-tag.outputs.tag }}"
-            echo "On branch main. Using new tag version $TAG."
-          else
             TAG="${{ steps.bump-semver.outputs.new_version }}"
+            echo "On branch main. Using new tag version $TAG."
+            git config user.name "${GITHUB_ACTOR}"
+            git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+            MESSAGE="${TAG}: automatic release"
+            git tag -a "${TAG}" -m "${MESSAGE}"
+            git push origin "${TAG}"
+          else
+            TAG="${{ steps.get-latest-tag.outputs.tag }}"
             echo "On tag $TAG. Using that version."
           fi
-          echo "::set-output name=version::$TAG"
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          git checkout "$TAG"
 
       - name: Publish new tag id possible
         # continue on error: when the tag exists we would like to still work it out
@@ -85,8 +58,43 @@ jobs:
         with:
           tag: ${{ steps.version.outputs.version }}
           message: |
-            ${{ steps.version.outputs.version }}: automatic release
-            PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
+
+  run-tests:
+    strategy:
+      matrix:
+        config:
+        # [Python version, tox env, OS]
+        - ["3.9",   "py39", "ubuntu-latest"]
+        - ["3.10",  "py310", "ubuntu-latest"]
+        - ["3.11",  "py311", "ubuntu-latest"]
+        - ["3.12",  "py312", "ubuntu-latest"]
+        - ["3.9",  "ruff", "ubuntu-latest"]
+        - ["3.11",  "exe", "windows-latest"]
+
+    runs-on: ${{ matrix.config[2] }}
+    name: ${{ matrix.config[1] }}
+    needs:
+      - version
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.config[0] }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+    - name: Test
+      run: |
+        tox -e ${{ matrix.config[1] }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: dist-${{ matrix.config[1] }}-${{ matrix.config[2] }}  # dist-exe-windows-latest
+        path: dist
+        if-no-files-found: ignore
+        retention-days: 1
+        compression-level: 0
 
   deploy-tag-to-pypi:
     name: Publish Package on PyPI
@@ -167,6 +175,10 @@ jobs:
           pattern: dist-*
           path: dist
       - run: ls -R dist
+      - name: Debug
+        run: |
+          echo "Runnning for tag ${{ needs.version.outputs.version }}"
+          git status
       - name: create release
         uses: ncipollo/release-action@v1
         with:
