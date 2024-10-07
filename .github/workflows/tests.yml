@@ -80,9 +80,6 @@ jobs:
     - name: Test
       run: |
         tox -e ${{ matrix.config[1] }}
-    - name: Version
-      continue-on-error: true
-      run: .tox/${{ matrix.config[1] }}/bin/ics-query --version
     - uses: actions/upload-artifact@v4
       with:
         name: dist-${{ matrix.config[1] }}-${{ matrix.config[2] }}  # dist-exe-windows-latest
