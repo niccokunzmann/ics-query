@@ -77,7 +77,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox
     - name: "Use version ${{ needs.version.outputs.version }}"
-      run: git checkout ${{ needs.version.outputs.version }}
+      run: |
+        git fetch
+        git checkout ${{ needs.version.outputs.version }}
     - name: Test
       run: |
         tox -e ${{ matrix.config[1] }}
@@ -120,7 +122,9 @@ jobs:
     - name: remove old files
       run: rm -rf dist/*
     - name: "Use version ${{ needs.version.outputs.version }}"
-      run: git checkout ${{ needs.version.outputs.version }}
+      run: |
+        git fetch
+        git checkout ${{ needs.version.outputs.version }}
     - name: build distribution files
       run: python -m build
     - name: deploy to pypi
