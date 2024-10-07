@@ -368,7 +368,12 @@ tox -e ruff
 
 ### New Release
 
-To release new versions,
+Renovate updates the dependencies automatically on the `main` branch.
+New commits on `main` are automatically published with an increased
+PATCH version number.
+
+To release a new version with a new MINOR or MAJOR version number change,
+follow these steps:
 
 1. edit the Changelog Section
 2. create a commit and push it
@@ -376,8 +381,8 @@ To release new versions,
 4. create a tag and push it
 
     ```shell
-    git tag v0.1.0a
-    git push origin v0.1.0a
+    git tag v0.1.0
+    git push origin v0.1.0
     ```
 
 5. Notify the issues about their release
