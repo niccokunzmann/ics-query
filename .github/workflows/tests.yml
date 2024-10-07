@@ -44,13 +44,57 @@ jobs:
         if-no-files-found: ignore
         retention-days: 1
         compression-level: 0
-        
+
+  version:
+    name: "Determine a new version"
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/tags/main' }}
+    runs-on: ubuntu-latest
+    outputs:
+      # see https://docs.github.com/de/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs#example-usage-of-the-jobs-context
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Get tags"
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+
+      - name: "Calculate new version"
+        uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        with:
+          current_version: ${{ steps.get-latest-tag.outputs.tag }}
+          level: patch
+      
+      - name: "Determine version to use"
+        id: version
+        run: |
+          if [ "$GITHUB_REF" == "refs/tags/main" ]; then
+            TAG="${{ steps.get-latest-tag.outputs.tag }}"
+            echo "On branch main. Using new tag version $TAG."
+          else
+            TAG="${{ steps.bump-semver.outputs.new_version }}"
+            echo "On tag $TAG. Using that version."
+          fi
+          echo "::set-output name=version::$TAG"
+
+      - name: Publish new tag id possible
+        # continue on error: when the tag exists we would like to still work it out
+        continue-on-error: true
+        uses: actions-ecosystem/action-push-tag@v1
+        with:
+          tag: ${{ steps.version.outputs.version }}
+          message: |
+            ${{ steps.version.outputs.version }}: automatic release
+            PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
+
   deploy-tag-to-pypi:
     name: Publish Package on PyPI
     # only deploy on tags, see https://stackoverflow.com/a/58478262/1320237
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/tags/main' }}
     needs:
     - run-tests
+    - version
     runs-on: ubuntu-latest
     # This environment stores the TWINE_USERNAME and TWINE_PASSWORD
     # see https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
@@ -110,10 +154,11 @@ jobs:
   github-release:
     name: "Publish GitHub Release"
     # only deploy on tags, see https://stackoverflow.com/a/58478262/1320237
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/tags/main' }}
     needs:
       - run-tests
       - deploy-tag-to-pypi
+      - version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -129,3 +174,4 @@ jobs:
           body: "For a list of changes, please refer to the [Changelog](https://github.com/niccokunzmann/ics-query#changelog)."
           generateReleaseNotes: false
           artifacts: "dist/dist-exe-windows-latest/ics-query.exe"
+          tag: ${{ needs.version.outputs.version }}
