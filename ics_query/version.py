@@ -18,6 +18,7 @@ try:
 except ModuleNotFoundError:
     __version__ = version = "0.0dev0"
     __version_tuple__ = version_tuple = (0, 0, "dev0")
+import sys
 from importlib.metadata import version as get_version
 
 cli_version = f"""{__version__}
@@ -39,6 +40,9 @@ for module in modules:
         cli_version += f"{module}: {get_version(module)}\n"
     except ModuleNotFoundError:  # noqa: PERF203
         cli_version += f"{module}: not installed\n"
+
+cli_version += f"""
+Python: {sys.version}"""
 
 __all__ = [
     "__version__",
