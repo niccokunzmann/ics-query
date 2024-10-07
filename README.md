@@ -384,6 +384,15 @@ To release new versions,
 
 ## Changelog
 
+We automatically release the versions that only update dependencies.
+If the version you installed does not show up here, only the dependencies
+have been updated.
+
+- v0.3.4
+
+  - Update dependencies
+  - Start automatic release of dependencies increasing the version number
+
 - v0.3.3b
 
   - Update dependencies
