@@ -51,14 +51,6 @@ jobs:
           echo "version=$TAG" >> $GITHUB_OUTPUT
           git checkout "$TAG"
 
-      - name: Publish new tag id possible
-        # continue on error: when the tag exists we would like to still work it out
-        continue-on-error: true
-        uses: actions-ecosystem/action-push-tag@v1
-        with:
-          tag: ${{ steps.version.outputs.version }}
-          message: |
-
   run-tests:
     strategy:
       matrix:
