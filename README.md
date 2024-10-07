@@ -388,6 +388,11 @@ We automatically release the versions that only update dependencies.
 If the version you installed does not show up here, only the dependencies
 have been updated.
 
+- v0.4.1
+
+  - Automatic release with patch level version number increased
+  - Increase patch version instead of minor version for automatic releases
+
 - v0.3.4
 
   - Update dependencies
