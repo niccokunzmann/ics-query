@@ -50,7 +50,7 @@ dependencies = [
     "click==8.1.8",
     "x-wr-timezone==2.0.0",
     "tzlocal==5.2",
-    "tzdata==2024.2",
+    "tzdata==2025.1",
     "python-dateutil==2.9.0.post0",
     "six==1.17.0",
 ]
