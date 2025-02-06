@@ -48,7 +48,7 @@ dependencies = [
     "icalendar==6.1.1",
     "recurring-ical-events==3.4.1",
     "click==8.1.8",
-    "x-wr-timezone==2.0.0",
+    "x-wr-timezone==2.0.1",
     "tzlocal==5.2",
     "tzdata==2025.1",
     "python-dateutil==2.9.0.post0",
