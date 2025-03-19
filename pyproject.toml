@@ -45,7 +45,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "icalendar==6.1.1",
+    "icalendar==6.1.2",
     "recurring-ical-events==3.6.0",
     "click==8.1.8",
     "x-wr-timezone==2.0.1",
