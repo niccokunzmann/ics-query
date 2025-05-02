@@ -325,6 +325,13 @@ while `b` and `c` can change.
 
 This section should set you up for developing `ics-query`.
 
+To create new commits, you should install [pre-commit](https://pre-commit.com/).
+Then run:
+
+```shell
+pre-commit install
+```
+
 ### Testing
 
 This project's development is driven by tests.
