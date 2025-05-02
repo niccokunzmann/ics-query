@@ -400,6 +400,12 @@ We automatically release the versions that only update dependencies.
 If the version you installed does not show up here, only the dependencies
 have been updated.
 
+- v0.4.32
+
+  - Update dependencies.
+  - Include recurrence ID in events to identify the occurrence in a series.
+  - Update help message in command line.
+
 - v0.4.1
 
   - Automatic release with patch level version number increased
