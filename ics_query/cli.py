@@ -210,7 +210,7 @@ def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
 
 
 def opt_license(*param_decls: str, **kwargs: t.Any) -> t.Callable:
-    """List available timezones.
+    """Show the license
 
     This is copied from the --help option.
     """
