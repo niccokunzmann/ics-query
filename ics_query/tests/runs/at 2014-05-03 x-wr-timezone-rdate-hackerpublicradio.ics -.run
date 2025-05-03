@@ -1,0 +1,9 @@
+BEGIN:VEVENT
+SUMMARY:HPR Community News
+DTSTART;TZID=Europe/London:20140503T200000
+DTEND;TZID=Europe/London:20140503T220000
+RECURRENCE-ID;TZID=Europe/London:20140503T200000
+DESCRIPTION:This is from http://www.hackerpublicradio.org/eps/hpr1286/iCal
+ endar_Hacking_shownotes.html
+LOCATION:mumble.openspeak.cc port: 64747
+END:VEVENT

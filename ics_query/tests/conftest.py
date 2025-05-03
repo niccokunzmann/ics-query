@@ -100,7 +100,7 @@ class IOTestCase(NamedTuple):
 io_test_case_paths = [
     test_case_path
     for test_case_path in IO_DIRECTORY.iterdir()
-    if test_case_path.is_file()
+    if test_case_path.is_file() and test_case_path.suffix == ".run"
 ]
 
 
