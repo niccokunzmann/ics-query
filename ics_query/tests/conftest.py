@@ -80,6 +80,8 @@ def run_ics_query(*command, cwd=CALENDARS_DIRECTORY, binary: str) -> ExampleRun:
         check=False,
         cwd=cwd,
     )
+    if completed_process.stderr:
+        print(completed_process.stderr.decode())
     return ExampleRun.from_completed_process(completed_process)
 
 

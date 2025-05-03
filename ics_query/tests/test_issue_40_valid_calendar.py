@@ -56,3 +56,13 @@ def test_calendar_adds_timezones_automatically(run, file):
     assert len(calendar.timezones) == 1
     tz: Timezone = calendar.timezones[0]
     assert tz.tz_name == "Europe/Berlin"
+
+
+def test_x_wr_timezone_is_added(run):
+    """X-WR-TIMEZONE requires adding the timezone component manually."""
+    calendar = run(
+        "first", "--as-calendar", "x-wr-timezone-rdate-hackerpublicradio.ics"
+    ).calendar
+    assert len(calendar.timezones) == 1
+    tz: Timezone = calendar.timezones[0]
+    assert tz.tz_name == "Europe/London"

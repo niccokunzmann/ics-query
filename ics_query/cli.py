@@ -24,7 +24,7 @@ import typing as t
 import zoneinfo
 
 import click
-from icalendar.cal import Calendar, Component
+from icalendar import Calendar, Component, Timezone
 from tzlocal import get_localzone_name
 
 from . import parse
@@ -35,7 +35,7 @@ if t.TYPE_CHECKING:
     from io import FileIO
 
     import recurring_ical_events
-    from icalendar import Component, Timezone
+    from icalendar import Component
 
     from .parse import Date
 
@@ -110,11 +110,8 @@ class CalendarResult(ComponentsResult):
         """Start the calendar."""
         super().__enter__()
         self.write(self.CALENDAR_START)
-        tzids = set()
         for timezone in self.timezones:
-            if timezone.tz_name not in tzids:
-                tzids.add(timezone.tz_name)
-                self.write(timezone.to_ical())
+            self.write(timezone.to_ical())
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Stop the calendar."""
@@ -178,8 +175,21 @@ class JoinedCalendars:
     def timezones(self) -> list[Timezone]:
         """Return all the timezones in use."""
         result = []
+        tzids = set()
+        # add existing timezone components first
         for calendar in self.calendars:
-            result.extend(calendar.timezones)
+            for timezone in calendar.timezones:
+                if timezone.tz_name not in tzids:
+                    tzids.add(timezone.tz_name)
+                    result.append(timezone)
+        # add X-WR-TIMEZONE later to prevent generating if existing
+        for calendar in self.calendars:
+            tzid = calendar.get("X-WR-TIMEZONE", None)
+            if tzid is not None and tzid not in tzids:
+                timezone = Timezone.from_tzid(tzid)
+                tzids.add(timezone.tz_name)
+                tzids.add(tzid)
+                result.append(timezone)
         return result
 
 
