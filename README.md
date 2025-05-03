@@ -92,6 +92,8 @@ LAST-MODIFIED:20190303T111937
 END:VEVENT
 ```
 
+#### Concatenating Calendars
+
 We can concatenate calendars and pipe them into `ics-query`.
 In the example below, we get all events that happen right now in two calendars.
 
@@ -107,6 +109,30 @@ You can pipe one or more calendars into the input.
 
 ```shell
 cat calendar.ics | ics-query first -
+```
+
+#### Valid ICS files
+
+The resulting events are missing the timezone and the calendar information by default.
+This information can be added using the `--as-calendar` parameter.
+The result is a valid `.ics` file that can be processed further by other commands and programs.
+
+In the example below, we use the calendar command to inspect the event for human readability.
+
+```shell
+$ ics-query at --as-calendar 2014-05-03 x-wr-timezone-rdate-hackerpublicradio.ics event.ics
+$ icalendar event.ics
+    Organizer: 
+    Attendees:
+
+    Summary    : HPR Community News
+    Starts     : Sat May  3 20:00:00 2014
+    End        : Sat May  3 22:00:00 2014
+    Duration   : 2:00:00
+    Location   : mumble.openspeak.cc port: 64747
+    Comment    : 
+    Description:
+     This is from http://www.hackerpublicradio.org/eps/hpr1286/iCalendar_Hacking_shownotes.html
 ```
 
 ### Events at Certain Times
@@ -399,6 +425,10 @@ follow these steps:
 We automatically release the versions that only update dependencies.
 If the version you installed does not show up here, only the dependencies
 have been updated.
+
+- v0.4.33
+
+  - Add `--as-calendar` parameter.
 
 - v0.4.32
 
