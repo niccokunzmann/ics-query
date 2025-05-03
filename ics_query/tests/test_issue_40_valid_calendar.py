@@ -13,11 +13,11 @@ from icalendar import Calendar
 from ics_query import __version__
 
 if TYPE_CHECKING:
-    from ics_query.tests.conftest import TestRun
+    from ics_query.tests.conftest import ExampleRun
 
 
 @pytest.fixture()
-def calendar(run) -> TestRun:
+def calendar(run) -> ExampleRun:
     """Return a calendar that is wrapped around the event."""
     result = run("first", "--as-calendar", "one-event-without-timezone.ics")
     return Calendar.from_ical(result.output)

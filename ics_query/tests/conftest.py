@@ -28,7 +28,7 @@ IO_DIRECTORY = HERE / "runs"
 CALENDARS_DIRECTORY = IO_DIRECTORY / "calendars"
 
 
-class TestRun(NamedTuple):
+class ExampleRun(NamedTuple):
     """The result from a test run."""
 
     exit_code: int
@@ -38,7 +38,7 @@ class TestRun(NamedTuple):
     @classmethod
     def from_completed_process(
         cls, completed_process: subprocess.CompletedProcess
-    ) -> TestRun:
+    ) -> ExampleRun:
         """Create a new run result."""
         stdout = completed_process.stdout.decode("UTF-8").replace("\r\n", "\n")
         print(stdout)
@@ -59,7 +59,7 @@ def get_binary_path(request: pytest.FixtureRequest) -> str:
     return Path(command).absolute()
 
 
-def run_ics_query(*command, cwd=CALENDARS_DIRECTORY, binary: str) -> TestRun:
+def run_ics_query(*command, cwd=CALENDARS_DIRECTORY, binary: str) -> ExampleRun:
     """Run ics-qeury with a command.
 
     - cwd is the working directory
@@ -74,7 +74,7 @@ def run_ics_query(*command, cwd=CALENDARS_DIRECTORY, binary: str) -> TestRun:
         check=False,
         cwd=cwd,
     )
-    return TestRun.from_completed_process(completed_process)
+    return ExampleRun.from_completed_process(completed_process)
 
 
 class IOTestCase(NamedTuple):
@@ -92,7 +92,7 @@ class IOTestCase(NamedTuple):
         expected_output = path.read_text(encoding="UTF-8").replace("\r\n", "\n")
         return cls(path.name, path.stem.split(), path.parent, expected_output, binary)
 
-    def run(self) -> TestRun:
+    def run(self) -> ExampleRun:
         """Run this test case and return the result."""
         return run_ics_query(*self.command, binary=self.binary)
 
@@ -112,8 +112,8 @@ def io_testcase(request: pytest.FixtureRequest) -> IOTestCase:
     return IOTestCase.from_path(path, binary)
 
 
-@pytest.fixture
-def run(request: pytest.FixtureRequest) -> Callable[..., TestRun]:
+@pytest.fixture()
+def run(request: pytest.FixtureRequest) -> Callable[..., ExampleRun]:
     """Return a runner function."""
 
     def run(*args, **kw):
@@ -123,4 +123,4 @@ def run(request: pytest.FixtureRequest) -> Callable[..., TestRun]:
     return run
 
 
-__all__ = ["IOTestCase", "TestRun"]
+__all__ = ["IOTestCase", "ExampleRun"]

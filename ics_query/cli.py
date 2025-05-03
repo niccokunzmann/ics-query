@@ -198,6 +198,7 @@ opt_calendar = click.option(
     envvar=ENV_PREFIX + "_AS_CALENDAR",
     is_flag=True,
     default=False,
+    is_eager=True,
     help="Return a valid calendar, not just the components.",
 )
 
