@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Callable, NamedTuple
 
 import pytest
+from icalendar import Calendar
 
 HERE = Path(__file__).parent
 IO_DIRECTORY = HERE / "runs"
@@ -47,6 +48,11 @@ class ExampleRun(NamedTuple):
             stdout,
             completed_process.stderr.decode("UTF-8"),
         )
+
+    @property
+    def calendar(self) -> Calendar:
+        """Return the output as a calendar."""
+        return Calendar.from_ical(self.output)
 
 
 def get_binary_path(request: pytest.FixtureRequest) -> str:

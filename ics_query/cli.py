@@ -35,6 +35,7 @@ if t.TYPE_CHECKING:
     from io import FileIO
 
     import recurring_ical_events
+    from icalendar import Timezone
     from icalendar.cal import Component
 
     from .parse import Date
@@ -69,6 +70,12 @@ class ComponentsResult:
         self._file = output
         self._entered = False
 
+    def write(self, data: bytes | str):
+        """Write data to the output."""
+        if isinstance(data, str):
+            data = data.encode()
+        self._file.write(data)
+
     def __enter__(self):
         """Start adding components."""
         self._entered = True
@@ -80,7 +87,7 @@ class ComponentsResult:
     def add_component(self, component: Component) -> None:
         """Return a component."""
         assert self._entered
-        self._file.write(component.to_ical())
+        self.write(component.to_ical())
 
     def add_components(self, components: t.Iterable[Component]) -> None:
         """Add all components."""
@@ -92,18 +99,27 @@ class CalendarResult(ComponentsResult):
     """Wrap the resulting components in a calendar."""
 
     CALENDAR_START = (
-        "BEGIN:VCALENDAR\r\n" "VERSION:2.0\r\n" f"PRODID:ics-query {__version__}\r\n"
+        f"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:ics-query {__version__}\r\n"
     )
     CALENDAR_END = "END:VCALENDAR\r\n"
+
+    def __init__(self, output: FileIO, timezones: list[Timezone]):
+        super().__init__(output)
+        self.timezones = timezones
 
     def __enter__(self):
         """Start the calendar."""
         super().__enter__()
-        self._file.write(self.CALENDAR_START.encode())
+        self.write(self.CALENDAR_START)
+        tzids = set()
+        for timezone in self.timezones:
+            if timezone.tz_name not in tzids:
+                tzids.add(timezone.tz_name)
+                self.write(timezone.to_ical())
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Stop the calendar."""
-        self._file.write(self.CALENDAR_END.encode())
+        self.write(self.CALENDAR_END)
         super().__exit__(exc_type, exc_value, traceback)
 
 
@@ -121,7 +137,8 @@ class ComponentsResultArgument(click.File):
         # we claim the as_calendar argument
         wrap_calendar = ctx.params.pop("as_calendar", False)
         if wrap_calendar:
-            return CalendarResult(file)
+            joined: JoinedCalendars = ctx.params["calendar"]
+            return CalendarResult(file, joined.timezones)
         return ComponentsResult(file)
 
 
@@ -130,6 +147,7 @@ class JoinedCalendars:
         self, calendars: list[Calendar], timezone: str, components: t.Sequence[str]
     ):
         """Join multiple calendars."""
+        self.calendars = calendars
         self.queries = [
             Query(calendar, timezone, components=components) for calendar in calendars
         ]
@@ -156,6 +174,14 @@ class JoinedCalendars:
     ) -> t.Generator[Component]:
         for query in self.queries:
             yield from query.between(start, end)
+
+    @property
+    def timezones(self) -> list[Timezone]:
+        """Return all the timezones in use."""
+        result = []
+        for calendar in self.calendars:
+            result.extend(calendar.timezones)
+        return result
 
 
 class CalendarQueryInputArgument(click.File):
