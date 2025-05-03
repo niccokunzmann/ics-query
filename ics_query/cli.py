@@ -29,7 +29,7 @@ from tzlocal import get_localzone_name
 
 from . import parse
 from .query import Query
-from .version import cli_version
+from .version import __version__, cli_version
 
 if t.TYPE_CHECKING:
     from io import FileIO
@@ -67,15 +67,44 @@ class ComponentsResult:
     def __init__(self, output: FileIO):
         """Create a new result."""
         self._file = output
+        self._entered = False
 
-    def add_component(self, component: Component):
+    def __enter__(self):
+        """Start adding components."""
+        self._entered = True
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Stop adding components."""
+        self._entered = False
+
+    def add_component(self, component: Component) -> None:
         """Return a component."""
+        assert self._entered
         self._file.write(component.to_ical())
 
-    def add_components(self, components: t.Iterable[Component]):
+    def add_components(self, components: t.Iterable[Component]) -> None:
         """Add all components."""
         for component in components:
             self.add_component(component)
+
+
+class CalendarResult(ComponentsResult):
+    """Wrap the resulting components in a calendar."""
+
+    CALENDAR_START = (
+        "BEGIN:VCALENDAR\r\n" "VERSION:2.0\r\n" f"PRODID:ics-query {__version__}\r\n"
+    )
+    CALENDAR_END = "END:VCALENDAR\r\n"
+
+    def __enter__(self):
+        """Start the calendar."""
+        super().__enter__()
+        self._file.write(self.CALENDAR_START.encode())
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Stop the calendar."""
+        self._file.write(self.CALENDAR_END.encode())
+        super().__exit__(exc_type, exc_value, traceback)
 
 
 class ComponentsResultArgument(click.File):
@@ -89,6 +118,10 @@ class ComponentsResultArgument(click.File):
     ) -> ComponentsResult:
         """Return a ComponentsResult."""
         file = super().convert(value, param, ctx)
+        # we claim the as_calendar argument
+        wrap_calendar = ctx.params.pop("as_calendar", False)
+        if wrap_calendar:
+            return CalendarResult(file)
         return ComponentsResult(file)
 
 
@@ -160,6 +193,14 @@ opt_timezone = click.option(
     help=("Set the timezone. See also --available-timezones"),
 )
 
+opt_calendar = click.option(
+    "--as-calendar",
+    envvar=ENV_PREFIX + "_AS_CALENDAR",
+    is_flag=True,
+    default=False,
+    help="Return a valid calendar, not just the components.",
+)
+
 
 def arg_calendar(func):
     """Decorator for a calendar argument with all used options."""
@@ -173,9 +214,12 @@ def arg_calendar(func):
     return opt_timezone(opt_components(arg(wrapper)))
 
 
-arg_output = click.argument("output", type=ComponentsResultArgument("wb"), default="-")
-# Option with many values and list as result
-# see https://click.palletsprojects.com/en/latest/options/#multiple-options
+def arg_output(func):
+    """Add the output argument and its parameters."""
+    # Option with many values and list as result
+    # see https://click.palletsprojects.com/en/latest/options/#multiple-options
+    arg = click.argument("output", type=ComponentsResultArgument("wb"), default="-")
+    return opt_calendar(arg(func))
 
 
 def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
@@ -458,7 +502,8 @@ def at(calendar: JoinedCalendars, output: ComponentsResult, date: Date):
             ics-query at 19900101235959       # 1st January 1990, 23:59:59
             ics-query at `date +%Y%m%d%H%M%S` # now
     """  # noqa: D301
-    output.add_components(calendar.at(date))
+    with output:
+        output.add_components(calendar.at(date))
 
 
 @cli.command()
@@ -475,7 +520,8 @@ def first(calendar: JoinedCalendars, output: ComponentsResult):
         ics-query first --component VEVENT calendar.ics -
 
     """  # noqa: D301
-    output.add_components(calendar.first())
+    with output:
+        output.add_components(calendar.first())
 
 
 @cli.command()
@@ -499,7 +545,8 @@ def all(calendar: JoinedCalendars, output: ComponentsResult):  # noqa: A001
     potentially enourmous. You can mitigate this by closing the OUTPUT
     when you have enough e.g. with a head command.
     """  # noqa: D301
-    output.add_components(calendar.all())
+    with output:
+        output.add_components(calendar.all())
 
 
 @cli.command()
@@ -683,7 +730,8 @@ def between(
     Add 3 hours and 15 minutes to START: +3h15m
 
     """  # noqa: D301
-    output.add_components(calendar.between(start, end))
+    with output:
+        output.add_components(calendar.between(start, end))
 
 
 def main():
