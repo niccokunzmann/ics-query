@@ -35,8 +35,7 @@ if t.TYPE_CHECKING:
     from io import FileIO
 
     import recurring_ical_events
-    from icalendar import Timezone
-    from icalendar.cal import Component
+    from icalendar import Component, Timezone
 
     from .parse import Date
 
