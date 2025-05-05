@@ -24,18 +24,18 @@ import typing as t
 import zoneinfo
 
 import click
-from icalendar.cal import Calendar, Component
+from icalendar import Calendar, Component, Timezone
 from tzlocal import get_localzone_name
 
 from . import parse
 from .query import Query
-from .version import cli_version
+from .version import __version__, cli_version
 
 if t.TYPE_CHECKING:
     from io import FileIO
 
     import recurring_ical_events
-    from icalendar.cal import Component
+    from icalendar import Component
 
     from .parse import Date
 
@@ -67,15 +67,56 @@ class ComponentsResult:
     def __init__(self, output: FileIO):
         """Create a new result."""
         self._file = output
+        self._entered = False
 
-    def add_component(self, component: Component):
+    def write(self, data: bytes | str):
+        """Write data to the output."""
+        if isinstance(data, str):
+            data = data.encode()
+        self._file.write(data)
+
+    def __enter__(self):
+        """Start adding components."""
+        self._entered = True
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Stop adding components."""
+        self._entered = False
+
+    def add_component(self, component: Component) -> None:
         """Return a component."""
-        self._file.write(component.to_ical())
+        assert self._entered
+        self.write(component.to_ical())
 
-    def add_components(self, components: t.Iterable[Component]):
+    def add_components(self, components: t.Iterable[Component]) -> None:
         """Add all components."""
         for component in components:
             self.add_component(component)
+
+
+class CalendarResult(ComponentsResult):
+    """Wrap the resulting components in a calendar."""
+
+    CALENDAR_START = (
+        f"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:ics-query {__version__}\r\n"
+    )
+    CALENDAR_END = "END:VCALENDAR\r\n"
+
+    def __init__(self, output: FileIO, timezones: list[Timezone]):
+        super().__init__(output)
+        self.timezones = timezones
+
+    def __enter__(self):
+        """Start the calendar."""
+        super().__enter__()
+        self.write(self.CALENDAR_START)
+        for timezone in self.timezones:
+            self.write(timezone.to_ical())
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Stop the calendar."""
+        self.write(self.CALENDAR_END)
+        super().__exit__(exc_type, exc_value, traceback)
 
 
 class ComponentsResultArgument(click.File):
@@ -89,6 +130,11 @@ class ComponentsResultArgument(click.File):
     ) -> ComponentsResult:
         """Return a ComponentsResult."""
         file = super().convert(value, param, ctx)
+        # we claim the as_calendar argument
+        wrap_calendar = ctx.params.pop("as_calendar", False)
+        if wrap_calendar:
+            joined: JoinedCalendars = ctx.params["calendar"]
+            return CalendarResult(file, joined.timezones)
         return ComponentsResult(file)
 
 
@@ -97,6 +143,7 @@ class JoinedCalendars:
         self, calendars: list[Calendar], timezone: str, components: t.Sequence[str]
     ):
         """Join multiple calendars."""
+        self.calendars = calendars
         self.queries = [
             Query(calendar, timezone, components=components) for calendar in calendars
         ]
@@ -123,6 +170,27 @@ class JoinedCalendars:
     ) -> t.Generator[Component]:
         for query in self.queries:
             yield from query.between(start, end)
+
+    @property
+    def timezones(self) -> list[Timezone]:
+        """Return all the timezones in use."""
+        result = []
+        tzids = set()
+        # add existing timezone components first
+        for calendar in self.calendars:
+            for timezone in calendar.timezones:
+                if timezone.tz_name not in tzids:
+                    tzids.add(timezone.tz_name)
+                    result.append(timezone)
+        # add X-WR-TIMEZONE later to prevent generating if existing
+        for calendar in self.calendars:
+            tzid = calendar.get("X-WR-TIMEZONE", None)
+            if tzid is not None and tzid not in tzids:
+                timezone = Timezone.from_tzid(tzid)
+                tzids.add(timezone.tz_name)
+                tzids.add(tzid)
+                result.append(timezone)
+        return result
 
 
 class CalendarQueryInputArgument(click.File):
@@ -160,6 +228,15 @@ opt_timezone = click.option(
     help=("Set the timezone. See also --available-timezones"),
 )
 
+opt_calendar = click.option(
+    "--as-calendar",
+    envvar=ENV_PREFIX + "_AS_CALENDAR",
+    is_flag=True,
+    default=False,
+    is_eager=True,
+    help="Return a valid calendar, not just the components.",
+)
+
 
 def arg_calendar(func):
     """Decorator for a calendar argument with all used options."""
@@ -173,9 +250,12 @@ def arg_calendar(func):
     return opt_timezone(opt_components(arg(wrapper)))
 
 
-arg_output = click.argument("output", type=ComponentsResultArgument("wb"), default="-")
-# Option with many values and list as result
-# see https://click.palletsprojects.com/en/latest/options/#multiple-options
+def arg_output(func):
+    """Add the output argument and its parameters."""
+    # Option with many values and list as result
+    # see https://click.palletsprojects.com/en/latest/options/#multiple-options
+    arg = click.argument("output", type=ComponentsResultArgument("wb"), default="-")
+    return opt_calendar(arg(func))
 
 
 def opt_available_timezones(*param_decls: str, **kwargs: t.Any) -> t.Callable:
@@ -458,7 +538,8 @@ def at(calendar: JoinedCalendars, output: ComponentsResult, date: Date):
             ics-query at 19900101235959       # 1st January 1990, 23:59:59
             ics-query at `date +%Y%m%d%H%M%S` # now
     """  # noqa: D301
-    output.add_components(calendar.at(date))
+    with output:
+        output.add_components(calendar.at(date))
 
 
 @cli.command()
@@ -475,7 +556,8 @@ def first(calendar: JoinedCalendars, output: ComponentsResult):
         ics-query first --component VEVENT calendar.ics -
 
     """  # noqa: D301
-    output.add_components(calendar.first())
+    with output:
+        output.add_components(calendar.first())
 
 
 @cli.command()
@@ -499,7 +581,8 @@ def all(calendar: JoinedCalendars, output: ComponentsResult):  # noqa: A001
     potentially enourmous. You can mitigate this by closing the OUTPUT
     when you have enough e.g. with a head command.
     """  # noqa: D301
-    output.add_components(calendar.all())
+    with output:
+        output.add_components(calendar.all())
 
 
 @cli.command()
@@ -683,7 +766,8 @@ def between(
     Add 3 hours and 15 minutes to START: +3h15m
 
     """  # noqa: D301
-    output.add_components(calendar.between(start, end))
+    with output:
+        output.add_components(calendar.between(start, end))
 
 
 def main():
