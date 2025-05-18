@@ -261,6 +261,7 @@ You can specify which components you would like to get using the
 -c VEVENT   # only events
 -c VTODO    # only TODOs
 -c VJOURNAL # only journal entries
+-c VALARM   # only components with the calculated alarm
 -c VEVENT -c VTODO # only events and journal entries
 ```
 
@@ -288,6 +289,15 @@ ics-query --help
 
 Alarms are special because they do not occur alone.
 They are located inside another component like a VEVENT or VTODO.
+
+Considerations:
+
+- If you query a time span, the component might actually happen outside of the time span
+  but the alarm happens within the timespan.
+- Absolute alarms may only be included once and not for every occurrence.
+- Each resulting occurrence only has one alarm in them.
+- Do not mix `-c VEVENT` and others with `-c VALARM` or you might not know if
+  the alarm or the component is inside the time span.
 
 As an example, if you want to get all alarms and the event summary that they are for,
 you would be interested in the `SUMMARY` of the event and the `TRIGGER` of the alarm.
