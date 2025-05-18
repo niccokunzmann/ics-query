@@ -451,6 +451,10 @@ We automatically release the versions that only update dependencies.
 If the version you installed does not show up here, only the dependencies
 have been updated.
 
+- v0.4.37
+
+  - Test and support Python 3.13. See [Issue 9](https://github.com/niccokunzmann/ics-query/issues/9).
+
 - v0.4.36
 
   - Test and document `VALARM`. See [Issue 16](https://github.com/niccokunzmann/ics-query/issues/16).
