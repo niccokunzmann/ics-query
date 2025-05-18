@@ -284,6 +284,21 @@ Please see the command documentation for more help:
 ics-query --help
 ```
 
+### Alarms
+
+Alarms are special because they do not occur alone.
+They are located inside another component like a VEVENT or VTODO.
+
+As an example, if you want to get all alarms and the event summary that they are for,
+you would be interested in the `SUMMARY` of the event and the `TRIGGER` of the alarm.
+
+```sh
+$ ics-query all -c VALARM --tz Europe/London alarm_1_week_before_event.ics - | grep -E 'TRIGGER|SUMMARY'
+SUMMARY:Event with an alarm 1 week before this starts        <-- Event summary
+TRIGGER;TZID=Europe/London:20241202T110000                   <-- Time of the alarm
+SUMMARY:Event with an alarm 1 week before this starts        <-- Event summary
+TRIGGER;TZID=Europe/London:20241207T110000                   <-- Time of the alarm
+```
 
 ### Timezones
 
