@@ -402,11 +402,24 @@ def cli():
     Components
     ----------
 
-    We support different types of recurring components: VEVENT, VTODO, VJOURNAL.
+    We support different types of recurring components:
+    VEVENT, VTODO, VJOURNAL, VALARM
     You can specify which can be in the result using the --component parameter.
 
-    You can also set the environment variable ICS_QUERY_COMPONENT to the timezone
+    You can also set the environment variable ICS_QUERY_COMPONENT to the component
     instead of passing --component.
+
+    For VALARM, please consider the following:
+
+    (1) If you query a time span, the component might actually happen outside of
+    the time span but the alarm happens within the time span.
+
+    (2) Absolute alarms may only be included once and not for every occurrence.
+
+    (3) Each resulting occurrence only has one alarm in them.
+
+    (4) Do not mix `-c VEVENT` and others with `-c VALARM` or you might not know if the
+    alarm or the component is inside the time span.
 
     """  # noqa: D301
 
