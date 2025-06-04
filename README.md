@@ -18,6 +18,11 @@ pip install ics-query
 ```
 
 For **Windows**, you can download `ics-query.exe` from our [Releases].
+For **MacOS**, you can use brew:
+
+```shell
+brew install niccokunzmann/tap/ics-query
+```
 
 ## Support
 
