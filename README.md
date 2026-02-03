@@ -529,6 +529,7 @@ have been updated.
 
 ## Related Work
 
+- [icalendar-events-cli](https://github.com/waldbaer/icalendar-events-cli#readme) - another command line impementation of `recurring-ical-events`
 - [icalBuddy](https://hasseg.org/icalBuddy/)
 - [Blog Post](https://opencollective.com/open-web-calendar/updates/calendar-calculation-on-the-command-line-ics-query)
 - [#icsquery on mastodon](https://toot.wales/tags/icsquery)
